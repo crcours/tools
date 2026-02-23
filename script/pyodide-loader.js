@@ -145,6 +145,7 @@ if 'turtle' in sys.modules:
       ['line', 'dot', 'fill', 'write', 'bgcolor'].includes(c.type)
     );
     if (hasDrawing) switchTab('turtle-panel');
+    else switchTab('output-panel');
     // [/TURTLE]
 
     const delay = getDelay();
