@@ -105,7 +105,7 @@ async function runCode() {
   // ── [TURTLE] Détection de l'import turtle ─────────────────
   // Supprimez ce bloc et la variable usesTurtle si pas de turtle.
   const usesTurtle = /import turtle|from turtle/.test(editor.getValue());
-  if (usesTurtle) switchTab('turtle-panel');
+  // (on ne bascule PAS encore ici — on attend de savoir si le canvas sera utilisé)
   // ── [/TURTLE] ─────────────────────────────────────────────
 
   try {
@@ -141,6 +141,10 @@ if 'turtle' in sys.modules:
       return obj;
     });
 
+    // Bascule sur turtle seulement si des commandes de dessin ont été émises
+    const hasDrawing = commands.some(c => ['line','dot','fill','write','bgcolor'].includes(c.type));
+    if (hasDrawing) switchTab('turtle-panel');
+
     const delay = getDelay();
     replayCommands(commands, delay, () => {
       timing.textContent = `✔ ${((performance.now() - t0) / 1000).toFixed(3)}s`;
@@ -154,11 +158,11 @@ if 'turtle' in sys.modules:
     // Sans turtle, remplacez la condition ci-dessous par :
     // if (!stdoutBuf && !stderrBuf) appendOutput('info', '(aucune sortie)');
     // [TURTLE] ↓
-    if (!usesTurtle && !stdoutBuf && !stderrBuf) appendOutput('info', '(aucune sortie)');
+    if (!stdoutBuf && !stderrBuf && !hasDrawing) appendOutput('info', '(aucune sortie)');
     // [/TURTLE]
 
     // [TURTLE] Sans animation, on sort ici car runBtn sera réactivé par le callback
-    const delay2 = getDelay(); // relire pour cohérence
+    const delay2 = getDelay();
     if (delay2 > 0) return;
     // [/TURTLE]
     // Sans turtle : supprimez les 2 lignes ci-dessus
