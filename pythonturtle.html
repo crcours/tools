@@ -40,6 +40,10 @@
     .CodeMirror-gutters { background: #21222c; border-right: 1px solid #2a2a3a; }
     .CodeMirror-linenumber { color: #3a3a6a; }
     .CodeMirror-activeline-background { background: #ffffff08 !important; }
+
+    /* Dracula ne stylise pas cm-builtin par défaut — on le fait ici */
+    .cm-s-dracula .cm-builtin  { color: #8be9fd; } /* cyan  — range, print, len… */
+    .cm-s-dracula .cm-variable { color: #f8f8f2; } /* blanc — variables normales  */
     #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     button {
       padding: 9px 20px; border: none; border-radius: 7px;
@@ -199,10 +203,10 @@ hideturtle()</textarea>
 <!-- turtle.js doit être chargé AVANT pyodide-loader.js -->
 <!-- Il expose : TURTLE_MODULE, clearCanvas(), replayCommands()  -->
 <!-- Supprimez cette ligne si vous n'utilisez pas turtle         -->
-<script src="script/turtle.js"></script>
+<script src="turtle.js"></script>
 
 <!-- pyodide-loader.js gère le chargement de Pyodide et l'exécution -->
-<script src="script/pyodide-loader.js"></script>
+<script src="pyodide-loader.js"></script>
 
 </body>
 </html>
