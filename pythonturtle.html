@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Python Interpreter + Turtle</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f0f1a; color: #e0e0e0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 24px 16px; gap: 14px;
+    }
+    header { display: flex; align-items: center; gap: 10px; }
+    header h1 { font-size: 1.4rem; font-weight: 600; color: #a8d8a8; }
+    #container { width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: 12px; }
+    #status {
+      text-align: center; font-size: 0.82rem; padding: 6px;
+      border-radius: 6px; background: #1a1a2e; border: 1px solid #2a2a3a;
+    }
+    #status.loading { color: #f0c060; }
+    #status.ready   { color: #6ecf6e; }
+    #status.error   { color: #f07070; }
+    #editor-wrap {
+      display: flex; border-radius: 10px; overflow: hidden;
+      border: 1px solid #2a2a3a; background: #13131f;
+    }
+    #line-nums {
+      background: #0d0d18; border-right: 1px solid #2a2a3a;
+      color: #3a3a5a; font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 14px; line-height: 22px; padding: 12px 8px;
+      text-align: right; user-select: none; min-width: 40px; white-space: pre;
+    }
+    #code {
+      flex: 1; min-height: 220px; background: transparent; color: #c8d8f8;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 14px; line-height: 22px; padding: 12px;
+      border: none; outline: none; resize: vertical; tab-size: 4;
+    }
+    #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button {
+      padding: 9px 20px; border: none; border-radius: 7px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    #run-btn { background: #2e7d32; color: #fff; flex: 1; }
+    #run-btn:hover:not(:disabled) { background: #388e3c; }
+    #clear-btn { background: #1e1e2e; color: #888; border: 1px solid #2a2a3a; }
+    #clear-btn:hover { background: #2a2a3a; }
+    #reset-turtle-btn { background: #1a2a3a; color: #6ab4d8; border: 1px solid #2a3a4a; }
+    #reset-turtle-btn:hover { background: #2a3a4a; }
+    .speed-wrap {
+      display: flex; align-items: center; gap: 8px;
+      background: #1a1a2e; border: 1px solid #2a2a3a;
+      border-radius: 7px; padding: 6px 12px; font-size: 0.8rem; color: #888;
+    }
+    #speed-slider {
+      -webkit-appearance: none; width: 100px; height: 4px;
+      border-radius: 2px; background: #2a2a4a; outline: none;
+    }
+    #speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: #6ecf6e; cursor: pointer;
+    }
+    #speed-label { color: #a8d8a8; font-weight: 600; min-width: 28px; }
+    .hint { font-size: 0.72rem; color: #444; text-align: right; }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2a3a; }
+    .tab-btn {
+      padding: 7px 16px; border-radius: 7px 7px 0 0;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      background: #1a1a2e; color: #666;
+      border: 1px solid #2a2a3a; border-bottom: none; transition: all 0.15s;
+    }
+    .tab-btn.active { background: #13131f; color: #a8d8a8; }
+    .tab-btn:hover:not(.active) { color: #aaa; background: #1e1e2e; }
+    #output-wrap {
+      background: #0b0b15; border: 1px solid #2a2a3a;
+      border-radius: 0 10px 10px 10px; overflow: hidden; min-height: 140px;
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .out-header {
+      background: #13131f; border-bottom: 1px solid #2a2a3a;
+      padding: 6px 14px; font-size: 0.75rem; color: #555;
+      display: flex; justify-content: space-between;
+    }
+    #output {
+      padding: 12px 14px; font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 13px; line-height: 1.7;
+      white-space: pre-wrap; word-break: break-word; min-height: 100px;
+    }
+    .stdout { color: #c8f0c8; }
+    .stderr { color: #ffaa55; }
+    .error  { color: #ff7070; }
+    .info   { color: #555; font-style: italic; }
+    #turtle-panel { display: none; flex-direction: column; align-items: center; padding: 12px; gap: 8px; }
+    #turtle-panel.active { display: flex; }
+    #turtle-canvas { background: white; border-radius: 6px; max-width: 100%; }
+    .turtle-info { font-size: 0.72rem; color: #444; }
+  </style>
+</head>
+<body>
+
+<header>
+  <span style="font-size:1.8rem">🐍</span>
+  <h1>Python Interpreter + Turtle</h1>
+</header>
+
+<div id="container">
+  <div id="status" class="loading">⏳ Chargement de Pyodide… (première fois ~10s)</div>
+
+  <div id="editor-wrap">
+    <div id="line-nums">1</div>
+    <textarea id="code" spellcheck="false">from turtle import *
+
+colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
+
+for i in range(180):
+    color(colors[i % len(colors)])
+    forward(i * 1.5)
+    right(59)
+
+hideturtle()</textarea>
+  </div>
+
+  <p class="hint">Ctrl + Entrée pour exécuter</p>
+
+  <div id="controls">
+    <button id="run-btn" disabled>▶ Exécuter</button>
+    <button id="reset-turtle-btn">🐢 Reset canvas</button>
+    <button id="clear-btn">🗑 Effacer sortie</button>
+    <div class="speed-wrap">
+      🐢 Vitesse :
+      <input type="range" id="speed-slider" min="0" max="10" value="10">
+      <span id="speed-label">max</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="output-panel">📄 Sortie texte</button>
+    <button class="tab-btn" data-tab="turtle-panel">🐢 Turtle</button>
+  </div>
+
+  <div id="output-wrap">
+    <div id="output-panel" class="panel active">
+      <div class="out-header"><span>Sortie</span><span id="timing"></span></div>
+      <div id="output"><span class="info">En attente d'exécution…</span></div>
+    </div>
+    <div id="turtle-panel" class="panel">
+      <canvas id="turtle-canvas" width="1000" height="800"></canvas>
+      <p class="turtle-info">Canvas 1000×800px — Centre = (0,0)</p>
+    </div>
+  </div>
+</div>
+
+<!-- Numéros de ligne + navigation clavier -->
+<script>
+  const codeEl   = document.getElementById('code');
+  const lineNums = document.getElementById('line-nums');
+
+  function updateLines() {
+    const n = codeEl.value.split('\n').length;
+    lineNums.textContent = Array.from({length: n}, (_, i) => i + 1).join('\n');
+  }
+  codeEl.addEventListener('input', updateLines);
+  updateLines();
+
+  codeEl.addEventListener('keydown', e => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = codeEl.selectionStart;
+      codeEl.value = codeEl.value.slice(0, s) + '    ' + codeEl.value.slice(codeEl.selectionEnd);
+      codeEl.selectionStart = codeEl.selectionEnd = s + 4;
+      updateLines();
+    }
+    if (e.ctrlKey && e.key === 'Enter') document.getElementById('run-btn').click();
+  });
+
+  // Navigation entre onglets
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+
+<!-- CDN Pyodide -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+<!-- turtle.js doit être chargé AVANT pyodide-loader.js -->
+<!-- Il expose : TURTLE_MODULE, clearCanvas(), replayCommands()  -->
+<!-- Supprimez cette ligne si vous n'utilisez pas turtle         -->
+<script src="script/turtle.js"></script>
+
+<!-- pyodide-loader.js gère le chargement de Pyodide et l'exécution -->
+<script src="scritp/pyodide-loader.js"></script>
+
+</body>
+</html>
