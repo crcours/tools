@@ -6,7 +6,6 @@
   <title>🐍 Python Interpreter + Turtle</title>
   <!-- CodeMirror 5 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,9 +40,30 @@
     .CodeMirror-linenumber { color: #3a3a6a; }
     .CodeMirror-activeline-background { background: #ffffff08 !important; }
 
-    /* Dracula ne stylise pas cm-builtin par défaut — on le fait ici */
-    .cm-s-dracula .cm-builtin  { color: #8be9fd; } /* cyan  — range, print, len… */
-    .cm-s-dracula .cm-variable { color: #f8f8f2; } /* blanc — variables normales  */
+    /* ── Thème custom-dark (remplace Dracula CDN) ── */
+    .cm-s-custom-dark.CodeMirror {
+      background: #282a36;
+      color: #f8f8f2;           /* texte par défaut / variables */
+    }
+    .cm-s-custom-dark .cm-keyword   { color: #ff79c6; font-weight: bold; } /* for, if, def, class, import… */
+    .cm-s-custom-dark .cm-operator  { color: #ff79c6; }                    /* =, +, -, *, not, and, or… */
+    .cm-s-custom-dark .cm-builtin   { color: #8be9fd; }                    /* range, print, len, int… */
+    .cm-s-custom-dark .cm-def       { color: #50fa7b; font-weight: bold; } /* nom après def/class */
+    .cm-s-custom-dark .cm-variable  { color: #f8f8f2; }                    /* variables normales */
+    .cm-s-custom-dark .cm-variable-2{ color: #f8f8f2; }
+    .cm-s-custom-dark .cm-string    { color: #f1fa8c; }                    /* "chaînes" */
+    .cm-s-custom-dark .cm-string-2  { color: #f1fa8c; }                    /* f-strings, r-strings */
+    .cm-s-custom-dark .cm-number    { color: #bd93f9; }                    /* 42, 3.14 */
+    .cm-s-custom-dark .cm-comment   { color: #6272a4; font-style: italic; }/* # commentaires */
+    .cm-s-custom-dark .cm-atom      { color: #bd93f9; }                    /* True, False, None */
+    .cm-s-custom-dark .cm-meta      { color: #f8f8f2; }
+    .cm-s-custom-dark .cm-error     { color: #ff5555; }
+    .cm-s-custom-dark .cm-bracket   { color: #f8f8f2; }
+    /* curseur et sélection */
+    .cm-s-custom-dark .CodeMirror-cursor      { border-left-color: #f8f8f2; }
+    .cm-s-custom-dark .CodeMirror-selected    { background: #44475a; }
+
+
     #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     button {
       padding: 9px 20px; border: none; border-radius: 7px;
@@ -171,7 +191,7 @@ hideturtle()</textarea>
   // Initialisation de CodeMirror
   const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
     mode: 'python',
-    theme: 'dracula',
+    theme: 'custom-dark',
     lineNumbers: true,
     indentUnit: 4,
     tabSize: 4,
