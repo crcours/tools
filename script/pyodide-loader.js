@@ -12,7 +12,7 @@
 //    - <div id="output">
 //    - <span id="timing">
 //    - variable globale `codeEl` (déclarée dans le script inline du HTML)
-//      OU remplacer codeEl.value par editor.getValue() si CodeMirror est utilisé
+//      OU remplacer editor.getValue() par editor.getValue() si CodeMirror est utilisé
 //
 //  Dépendances HTML [TURTLE] (supprimables si pas de turtle) :
 //    - <input id="speed-slider">
@@ -104,11 +104,7 @@ async function runCode() {
   pyodide.setStdout({ batched: s => { stdoutBuf += s + '\n'; } });
   pyodide.setStderr({ batched: s => { stderrBuf += s + '\n'; } });
 
-  // ── [TURTLE] Détection de l'import turtle ─────────────────
-  // Supprimez ce bloc si pas de turtle.
-  // On ne bascule PAS encore ici — on attend de savoir si le canvas sera utilisé.
-  const usesTurtle = /import turtle|from turtle/.test(codeEl.value);
-  // ── [/TURTLE] ─────────────────────────────────────────────
+
 
   try {
     // ── [TURTLE] Réinitialisation du canvas et de l'état Python
@@ -122,7 +118,7 @@ if 'turtle' in sys.modules:
 `);
     // ── [/TURTLE] ─────────────────────────────────────────────
 
-    await pyodide.runPythonAsync(codeEl.value);
+    await pyodide.runPythonAsync(editor.getValue());
 
     // ── [TURTLE] Flush de la position finale de la tortue ─────
     // Supprimez ce bloc si pas de turtle.
