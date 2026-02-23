@@ -26,8 +26,7 @@ const statusEl = document.getElementById('status');
 const runBtn   = document.getElementById('run-btn');
 const outputEl = document.getElementById('output');
 const timing   = document.getElementById('timing');
-// codeEl est déjà déclaré dans le script inline de index.html
-// const codeEl = document.getElementById('code');
+// `editor` (instance CodeMirror) est défini dans le script inline de index.html
 
 let pyodide = null;
 
@@ -105,7 +104,7 @@ async function runCode() {
 
   // ── [TURTLE] Détection de l'import turtle ─────────────────
   // Supprimez ce bloc et la variable usesTurtle si pas de turtle.
-  const usesTurtle = /import turtle|from turtle/.test(codeEl.value);
+  const usesTurtle = /import turtle|from turtle/.test(editor.getValue());
   if (usesTurtle) switchTab('turtle-panel');
   // ── [/TURTLE] ─────────────────────────────────────────────
 
@@ -121,7 +120,7 @@ if 'turtle' in sys.modules:
 `);
     // ── [/TURTLE] ─────────────────────────────────────────────
 
-    await pyodide.runPythonAsync(codeEl.value);
+    await pyodide.runPythonAsync(editor.getValue());
 
     // ── [TURTLE] Flush de la position finale de la tortue ─────
     // Supprimez ce bloc si pas de turtle.
