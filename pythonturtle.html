@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🐍 Python Interpreter + Turtle</title>
+  <!-- CodeMirror 5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -22,22 +26,20 @@
     #status.loading { color: #f0c060; }
     #status.ready   { color: #6ecf6e; }
     #status.error   { color: #f07070; }
+    /* ── CodeMirror overrides ── */
     #editor-wrap {
-      display: flex; border-radius: 10px; overflow: hidden;
-      border: 1px solid #2a2a3a; background: #13131f;
+      border-radius: 10px; overflow: hidden;
+      border: 1px solid #2a2a3a;
     }
-    #line-nums {
-      background: #0d0d18; border-right: 1px solid #2a2a3a;
-      color: #3a3a5a; font-family: 'Fira Code', 'Courier New', monospace;
-      font-size: 14px; line-height: 22px; padding: 12px 8px;
-      text-align: right; user-select: none; min-width: 40px; white-space: pre;
-    }
-    #code {
-      flex: 1; min-height: 220px; background: transparent; color: #c8d8f8;
+    .CodeMirror {
+      height: auto; min-height: 220px;
       font-family: 'Fira Code', 'Courier New', monospace;
-      font-size: 14px; line-height: 22px; padding: 12px;
-      border: none; outline: none; resize: vertical; tab-size: 4;
+      font-size: 14px; line-height: 22px;
     }
+    .CodeMirror-scroll { min-height: 220px; }
+    .CodeMirror-gutters { background: #21222c; border-right: 1px solid #2a2a3a; }
+    .CodeMirror-linenumber { color: #3a3a6a; }
+    .CodeMirror-activeline-background { background: #ffffff08 !important; }
     #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     button {
       padding: 9px 20px; border: none; border-radius: 7px;
@@ -113,8 +115,7 @@
   <div id="status" class="loading">⏳ Chargement de Pyodide… (première fois ~10s)</div>
 
   <div id="editor-wrap">
-    <div id="line-nums">1</div>
-    <textarea id="code" spellcheck="false">from turtle import *
+    <textarea id="code">from turtle import *
 
 colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
 
@@ -157,26 +158,28 @@ hideturtle()</textarea>
 </div>
 
 <!-- Numéros de ligne + navigation clavier -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
 <script>
-  const codeEl   = document.getElementById('code');
-  const lineNums = document.getElementById('line-nums');
-
-  function updateLines() {
-    const n = codeEl.value.split('\n').length;
-    lineNums.textContent = Array.from({length: n}, (_, i) => i + 1).join('\n');
-  }
-  codeEl.addEventListener('input', updateLines);
-  updateLines();
-
-  codeEl.addEventListener('keydown', e => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const s = codeEl.selectionStart;
-      codeEl.value = codeEl.value.slice(0, s) + '    ' + codeEl.value.slice(codeEl.selectionEnd);
-      codeEl.selectionStart = codeEl.selectionEnd = s + 4;
-      updateLines();
+  // Initialisation de CodeMirror
+  const editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+    mode: 'python',
+    theme: 'dracula',
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    matchBrackets: true,
+    autoCloseBrackets: true,
+    styleActiveLine: true,
+    extraKeys: {
+      'Tab': cm => cm.execCommand('indentMore'),
+      'Shift-Tab': cm => cm.execCommand('indentLess'),
+      'Ctrl-Enter': () => document.getElementById('run-btn').click()
     }
-    if (e.ctrlKey && e.key === 'Enter') document.getElementById('run-btn').click();
   });
 
   // Navigation entre onglets
@@ -196,10 +199,10 @@ hideturtle()</textarea>
 <!-- turtle.js doit être chargé AVANT pyodide-loader.js -->
 <!-- Il expose : TURTLE_MODULE, clearCanvas(), replayCommands()  -->
 <!-- Supprimez cette ligne si vous n'utilisez pas turtle         -->
-<script src="script/turtle.js"></script>
+<script src="turtle.js"></script>
 
 <!-- pyodide-loader.js gère le chargement de Pyodide et l'exécution -->
-<script src="script/pyodide-loader.js"></script>
+<script src="pyodide-loader.js"></script>
 
 </body>
 </html>
