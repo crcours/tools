@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎛️ MicroPython — Pico</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d1a;
+      --panel: #13131f;
+      --panel2: #0b0b15;
+      --border: #252535;
+      --text: #dde0f0;
+      --muted: #555;
+      --code: #c8d8f8;
+      --green: #6ecf6e;
+      --red: #ff6b6b;
+      --yellow: #f0c060;
+      --blue: #60aaff;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 16px 40px;
+      gap: 14px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo h1 { font-size: 1.3rem; font-weight: 700; color: #c8a8f8; }
+    .logo span { font-size: 1.6rem; }
+
+    /* ── CONNECTION BAR ── */
+    .conn-bar {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    .dot.connected    { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.connecting   { background: var(--yellow); animation: blink 0.8s infinite; }
+    .dot.disconnected { background: var(--red); }
+
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    #conn-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    select {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 7px;
+      font-size: 0.83rem;
+      outline: none;
+    }
+
+    .btn {
+      padding: 7px 16px;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-connect    { background: #2a1a5a; color: #c8a8f8; border: 1px solid #4a3a8a; }
+    .btn-connect:hover:not(:disabled) { background: #3a2a7a; }
+    .btn-disconnect { background: #3a1010; color: var(--red);  border: 1px solid #6a2020; }
+    .btn-disconnect:hover:not(:disabled) { background: #4a1818; }
+    .btn-interrupt  { background: #3a2800; color: var(--yellow); border: 1px solid #6a4800; }
+    .btn-interrupt:hover:not(:disabled) { background: #4a3400; }
+    .btn-reset      { background: #1a1a30; color: var(--blue); border: 1px solid #2a2a5a; }
+    .btn-reset:hover:not(:disabled) { background: #25254a; }
+
+    /* ── MAIN ── */
+    .main {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── EDITOR ── */
+    .editor-wrap {
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    #line-nums {
+      background: #0d0d18;
+      border-right: 1px solid var(--border);
+      color: #333355;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 22px;
+      padding: 12px 8px;
+      text-align: right;
+      user-select: none;
+      min-width: 42px;
+      white-space: pre;
+    }
+
+    #code {
+      flex: 1;
+      min-height: 240px;
+      background: transparent;
+      color: var(--code);
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 22px;
+      padding: 12px;
+      border: none;
+      outline: none;
+      resize: vertical;
+      tab-size: 4;
+    }
+
+    /* ── CONTROLS ── */
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-run {
+      background: #1c5c20; color: #a8f0a8;
+      border: 1px solid #2e7d32; flex: 1;
+      padding: 9px 20px; font-size: 0.9rem;
+    }
+    .btn-run:hover:not(:disabled) { background: #2e7d32; }
+
+    .btn-send-repl {
+      background: #1a2a4a; color: var(--blue);
+      border: 1px solid #2a4a8a;
+      padding: 9px 20px; font-size: 0.9rem;
+    }
+    .btn-send-repl:hover:not(:disabled) { background: #253a6a; }
+
+    .btn-clear-out {
+      background: var(--panel); color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 9px 14px; font-size: 0.9rem;
+    }
+    .btn-clear-out:hover { background: #1e1e30; }
+
+    .hint { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+
+    /* ── OUTPUT ── */
+    .output-wrap {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .out-header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .out-header-left { display: flex; align-items: center; gap: 10px; }
+
+    #live-badge {
+      font-size: 0.68rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #1a3a1a;
+      color: var(--green);
+      display: none;
+    }
+    #live-badge.visible { display: inline-block; animation: blink 1s infinite; }
+
+    #output {
+      padding: 12px 14px;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 140px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .out-stdout { color: #c8f0c8; }
+    .out-stderr { color: #ffaa55; }
+    .out-error  { color: var(--red); }
+    .out-info   { color: var(--muted); font-style: italic; }
+    .out-sys    { color: #a0c8ff; font-style: italic; }
+
+    /* ── REPL INPUT ── */
+    .repl-input-wrap {
+      display: flex;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      background: var(--panel2);
+      border-radius: 0 0 10px 10px;
+    }
+
+    .repl-prompt {
+      padding: 8px 10px;
+      color: var(--muted);
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    #repl-line {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--code);
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      padding: 8px 0;
+    }
+
+    #repl-send {
+      padding: 6px 14px;
+      margin: 4px 6px;
+      background: #1a2a4a;
+      color: var(--blue);
+      border: 1px solid #2a4a8a;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+    #repl-send:hover { background: #253a6a; }
+
+    /* ── BROWSER WARNING ── */
+    #browser-warn {
+      width: 100%;
+      max-width: 960px;
+      background: #2a1a00;
+      border: 1px solid #6a4400;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 0.88rem;
+      color: var(--yellow);
+      display: none;
+    }
+    #browser-warn.visible { display: block; }
+    #browser-warn a { color: #ffcc44; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <span>🎛️</span>
+    <h1>MicroPython — Pico</h1>
+  </div>
+  <div style="font-size:0.75rem;color:var(--muted)">WebSerial · Chrome/Edge requis</div>
+</header>
+
+<!-- Browser compatibility warning -->
+<div id="browser-warn">
+  ⚠️ <strong>WebSerial non supporté</strong> — Utilise Chrome ou Edge pour cette fonctionnalité.
+</div>
+
+<!-- Connection bar -->
+<div class="conn-bar">
+  <div class="dot" id="dot"></div>
+  <span id="conn-label">Non connecté</span>
+  <select id="baud-select">
+    <option value="115200" selected>115200 baud</option>
+    <option value="9600">9600 baud</option>
+    <option value="38400">38400 baud</option>
+  </select>
+  <button class="btn btn-connect"    id="btn-connect">🔌 Connecter</button>
+  <button class="btn btn-disconnect" id="btn-disconnect" disabled>⏏ Déconnecter</button>
+  <button class="btn btn-interrupt"  id="btn-interrupt"  disabled title="Ctrl+C">⏹ Interrompre</button>
+  <button class="btn btn-reset"      id="btn-reset"      disabled title="Soft reset">🔄 Reset</button>
+</div>
+
+<div class="main">
+
+  <!-- Editor -->
+  <div class="editor-wrap">
+    <div id="line-nums">1</div>
+    <textarea id="code" spellcheck="false">from machine import Pin
+import time
+
+led = Pin(25, Pin.OUT)  # LED interne du Pico
+
+for i in range(5):
+    led.toggle()
+    print(f"Toggle {i+1}")
+    time.sleep(0.5)
+
+print("Terminé !")</textarea>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="btn btn-run"       id="btn-run"      disabled>▶ Exécuter sur le Pico</button>
+    <button class="btn btn-send-repl" id="btn-paste"    disabled>📋 Mode paste</button>
+    <button class="btn btn-clear-out" id="btn-clear">🗑</button>
+    <span class="hint">Ctrl+Entrée pour exécuter</span>
+  </div>
+
+  <!-- Output -->
+  <div class="output-wrap">
+    <div class="out-header">
+      <div class="out-header-left">
+        <span>Terminal</span>
+        <span id="live-badge">● EN DIRECT</span>
+      </div>
+      <span id="timing"></span>
+    </div>
+    <div id="output"><span class="out-info">Connecte le Pico via USB, puis clique sur "Connecter".</span></div>
+    <!-- REPL line input -->
+    <div class="repl-input-wrap">
+      <span class="repl-prompt">&gt;&gt;&gt;</span>
+      <input id="repl-line" type="text" placeholder="Commande REPL directe…" disabled>
+      <button id="repl-send" disabled>Envoyer</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Browser check ──────────────────────────────────────────
+if (!('serial' in navigator)) {
+  document.getElementById('browser-warn').classList.add('visible');
+  document.getElementById('btn-connect').disabled = true;
+}
+
+// ── Elements ──────────────────────────────────────────────
+const dot         = document.getElementById('dot');
+const connLabel   = document.getElementById('conn-label');
+const btnConnect  = document.getElementById('btn-connect');
+const btnDisconn  = document.getElementById('btn-disconnect');
+const btnIntr     = document.getElementById('btn-interrupt');
+const btnReset    = document.getElementById('btn-reset');
+const btnRun      = document.getElementById('btn-run');
+const btnPaste    = document.getElementById('btn-paste');
+const btnClear    = document.getElementById('btn-clear');
+const codeEl      = document.getElementById('code');
+const outputEl    = document.getElementById('output');
+const lineNums    = document.getElementById('line-nums');
+const timingEl    = document.getElementById('timing');
+const liveBadge   = document.getElementById('live-badge');
+const replLine    = document.getElementById('repl-line');
+const replSend    = document.getElementById('repl-send');
+const baudSel     = document.getElementById('baud-select');
+
+// ── State ─────────────────────────────────────────────────
+let port = null;
+let writer = null;
+let reader = null;
+let reading = false;
+let runStartTime = null;
+
+// ── Line numbers ──────────────────────────────────────────
+function updateLines() {
+  const n = codeEl.value.split('\n').length;
+  lineNums.textContent = Array.from({length: n}, (_, i) => i + 1).join('\n');
+}
+codeEl.addEventListener('input', updateLines);
+updateLines();
+
+codeEl.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = codeEl.selectionStart;
+    codeEl.value = codeEl.value.slice(0, s) + '    ' + codeEl.value.slice(codeEl.selectionEnd);
+    codeEl.selectionStart = codeEl.selectionEnd = s + 4;
+    updateLines();
+  }
+  if (e.ctrlKey && e.key === 'Enter') runCode();
+});
+
+// ── UI helpers ────────────────────────────────────────────
+function setConnected(state) {
+  // state: 'disconnected' | 'connecting' | 'connected'
+  dot.className = 'dot ' + state;
+  const labels = {
+    disconnected: 'Non connecté',
+    connecting:   'Connexion…',
+    connected:    'Connecté'
+  };
+  connLabel.textContent = labels[state] || state;
+
+  const isConn = state === 'connected';
+  btnConnect.disabled  = isConn;
+  btnDisconn.disabled  = !isConn;
+  btnIntr.disabled     = !isConn;
+  btnReset.disabled    = !isConn;
+  btnRun.disabled      = !isConn;
+  btnPaste.disabled    = !isConn;
+  replLine.disabled    = !isConn;
+  replSend.disabled    = !isConn;
+  baudSel.disabled     = isConn;
+}
+
+function appendOutput(cls, text) {
+  if (!text) return;
+  const span = document.createElement('span');
+  span.className = cls;
+  span.textContent = text;
+  outputEl.appendChild(span);
+  outputEl.scrollTop = outputEl.scrollHeight;
+}
+
+function log(msg, cls = 'out-sys') {
+  appendOutput(cls, '\n[' + msg + ']\n');
+}
+
+// ── Connect ───────────────────────────────────────────────
+btnConnect.addEventListener('click', async () => {
+  try {
+    setConnected('connecting');
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: parseInt(baudSel.value) });
+
+    writer = port.writable.getWriter();
+    setConnected('connected');
+    log('Connecté — ' + baudSel.value + ' baud');
+
+    // Start reading loop
+    startReading();
+
+    // Send Ctrl+C to get a clean prompt
+    await sleep(200);
+    await sendRaw('\x03\r\n');
+
+  } catch(err) {
+    setConnected('disconnected');
+    log('Erreur : ' + err.message, 'out-error');
+  }
+});
+
+// ── Disconnect ────────────────────────────────────────────
+btnDisconn.addEventListener('click', async () => {
+  await disconnect();
+});
+
+async function disconnect() {
+  reading = false;
+  liveBadge.classList.remove('visible');
+  try {
+    if (writer)  { writer.releaseLock(); writer = null; }
+    if (reader)  { await reader.cancel(); reader = null; }
+    if (port)    { await port.close(); port = null; }
+  } catch {}
+  setConnected('disconnected');
+  log('Déconnecté');
+}
+
+// ── Read loop ─────────────────────────────────────────────
+async function startReading() {
+  reading = true;
+  liveBadge.classList.add('visible');
+  try {
+    while (port && port.readable && reading) {
+      reader = port.readable.getReader();
+      try {
+        const decoder = new TextDecoder();
+        while (reading) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value);
+          handleOutput(text);
+        }
+      } finally {
+        reader.releaseLock();
+        reader = null;
+      }
+    }
+  } catch(err) {
+    if (reading) log('Lecture interrompue : ' + err.message, 'out-error');
+  }
+  liveBadge.classList.remove('visible');
+}
+
+let outputBuf = '';
+let outputTimer = null;
+
+function handleOutput(raw) {
+  // Filter control chars but keep \n \r
+  let text = raw
+    .replace(/\x04/g, '')   // EOT (raw REPL end marker)
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
+
+  // Detect stderr (MicroPython sends errors starting with Traceback)
+  const isError = text.includes('Traceback') || text.includes('Error:');
+
+  // Buffer output for cleaner display
+  outputBuf += text;
+  clearTimeout(outputTimer);
+  outputTimer = setTimeout(() => {
+    if (outputBuf) {
+      appendOutput(isError ? 'out-stderr' : 'out-stdout', outputBuf);
+      if (runStartTime && outputBuf.includes('\n')) {
+        const dt = ((performance.now() - runStartTime) / 1000).toFixed(2);
+        timingEl.textContent = dt + 's';
+      }
+      outputBuf = '';
+    }
+  }, 30);
+}
+
+// ── Send raw bytes ────────────────────────────────────────
+async function sendRaw(str) {
+  if (!writer) return;
+  const enc = new TextEncoder();
+  await writer.write(enc.encode(str));
+}
+
+// ── Run code — raw REPL mode ──────────────────────────────
+// MicroPython raw REPL: Ctrl+A → paste code → Ctrl+D → executes
+async function runCode() {
+  if (!writer) return;
+  const code = codeEl.value;
+  if (!code.trim()) return;
+
+  outputEl.innerHTML = '';
+  timingEl.textContent = '';
+  runStartTime = performance.now();
+
+  log('Envoi du code (raw REPL)…');
+
+  // 1. Interrupt current execution
+  await sendRaw('\x03');   // Ctrl+C
+  await sleep(200);
+
+  // 2. Enter raw REPL mode
+  await sendRaw('\x01');   // Ctrl+A
+  await sleep(100);
+
+  // 3. Send code + execute
+  await sendRaw(code);
+  await sendRaw('\x04');   // Ctrl+D → execute
+
+  await sleep(100);
+
+  // 4. Exit raw REPL (back to friendly REPL)
+  await sendRaw('\x02');   // Ctrl+B
+}
+
+// ── Paste mode ────────────────────────────────────────────
+// Safer for multi-line code with indentation
+async function pasteMode() {
+  if (!writer) return;
+  const code = codeEl.value;
+  if (!code.trim()) return;
+
+  log('Envoi (paste mode)…');
+
+  await sendRaw('\x03');   // Ctrl+C
+  await sleep(100);
+  await sendRaw('\x05');   // Ctrl+E → paste mode
+  await sleep(100);
+  await sendRaw(code);
+  await sleep(100);
+  await sendRaw('\x04');   // Ctrl+D → execute
+}
+
+// ── Interrupt ─────────────────────────────────────────────
+btnIntr.addEventListener('click', async () => {
+  await sendRaw('\x03');
+  log('Ctrl+C envoyé');
+});
+
+// ── Soft reset ────────────────────────────────────────────
+btnReset.addEventListener('click', async () => {
+  await sendRaw('\x04');   // Ctrl+D → soft reset (in normal REPL)
+  log('Soft reset envoyé');
+});
+
+// ── REPL line input ───────────────────────────────────────
+let replHistory = [];
+let replHistIdx = -1;
+
+replLine.addEventListener('keydown', async e => {
+  if (e.key === 'Enter') {
+    const cmd = replLine.value;
+    if (!cmd) return;
+    replHistory.unshift(cmd);
+    replHistIdx = -1;
+    appendOutput('out-stdout', '>>> ' + cmd + '\n');
+    await sendRaw(cmd + '\r\n');
+    replLine.value = '';
+  }
+  if (e.key === 'ArrowUp') {
+    replHistIdx = Math.min(replHistIdx + 1, replHistory.length - 1);
+    replLine.value = replHistory[replHistIdx] || '';
+  }
+  if (e.key === 'ArrowDown') {
+    replHistIdx = Math.max(replHistIdx - 1, -1);
+    replLine.value = replHistIdx >= 0 ? replHistory[replHistIdx] : '';
+  }
+});
+
+replSend.addEventListener('click', async () => {
+  const cmd = replLine.value;
+  if (!cmd) return;
+  appendOutput('out-stdout', '>>> ' + cmd + '\n');
+  await sendRaw(cmd + '\r\n');
+  replLine.value = '';
+});
+
+// ── Buttons ───────────────────────────────────────────────
+btnRun.addEventListener('click', runCode);
+btnPaste.addEventListener('click', pasteMode);
+btnClear.addEventListener('click', () => {
+  outputEl.innerHTML = '';
+  timingEl.textContent = '';
+});
+
+// ── Utils ─────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
