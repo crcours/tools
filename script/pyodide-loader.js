@@ -11,7 +11,8 @@
 //    - <button id="run-btn">
 //    - <div id="output">
 //    - <span id="timing">
-//    - <textarea id="code">
+//    - variable globale `codeEl` (déclarée dans le script inline du HTML)
+//      OU remplacer codeEl.value par editor.getValue() si CodeMirror est utilisé
 //
 //  Dépendances HTML [TURTLE] (supprimables si pas de turtle) :
 //    - <input id="speed-slider">
@@ -26,7 +27,8 @@ const statusEl = document.getElementById('status');
 const runBtn   = document.getElementById('run-btn');
 const outputEl = document.getElementById('output');
 const timing   = document.getElementById('timing');
-// `editor` (instance CodeMirror) est défini dans le script inline de index.html
+// codeEl est déjà déclaré dans le script inline de index.html
+// const codeEl = document.getElementById('code');
 
 let pyodide = null;
 
@@ -103,9 +105,9 @@ async function runCode() {
   pyodide.setStderr({ batched: s => { stderrBuf += s + '\n'; } });
 
   // ── [TURTLE] Détection de l'import turtle ─────────────────
-  // Supprimez ce bloc et la variable usesTurtle si pas de turtle.
-  const usesTurtle = /import turtle|from turtle/.test(editor.getValue());
-  // (on ne bascule PAS encore ici — on attend de savoir si le canvas sera utilisé)
+  // Supprimez ce bloc si pas de turtle.
+  // On ne bascule PAS encore ici — on attend de savoir si le canvas sera utilisé.
+  const usesTurtle = /import turtle|from turtle/.test(codeEl.value);
   // ── [/TURTLE] ─────────────────────────────────────────────
 
   try {
@@ -120,7 +122,7 @@ if 'turtle' in sys.modules:
 `);
     // ── [/TURTLE] ─────────────────────────────────────────────
 
-    await pyodide.runPythonAsync(editor.getValue());
+    await pyodide.runPythonAsync(codeEl.value);
 
     // ── [TURTLE] Flush de la position finale de la tortue ─────
     // Supprimez ce bloc si pas de turtle.
@@ -141,9 +143,13 @@ if 'turtle' in sys.modules:
       return obj;
     });
 
-    // Bascule sur turtle seulement si des commandes de dessin ont été émises
-    const hasDrawing = commands.some(c => ['line','dot','fill','write','bgcolor'].includes(c.type));
+    // [TURTLE] Bascule sur turtle SEULEMENT si des commandes de dessin ont été émises
+    // Supprimez hasDrawing et la ligne switchTab si pas de turtle.
+    const hasDrawing = commands.some(c =>
+      ['line', 'dot', 'fill', 'write', 'bgcolor'].includes(c.type)
+    );
     if (hasDrawing) switchTab('turtle-panel');
+    // [/TURTLE]
 
     const delay = getDelay();
     replayCommands(commands, delay, () => {
