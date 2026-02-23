@@ -132,7 +132,7 @@ import math
 _W = int(js.window._turtleCanvas.width)
 _H = int(js.window._turtleCanvas.height)
 
-_x = 0.0; _y = 0.0; _angle = 90.0
+_x = 0.0; _y = 0.0; _angle = 0.0
 _pen_down = True
 _pen_color = 'black'; _fill_color = 'black'
 _pen_width = 1; _visible = True
@@ -184,7 +184,7 @@ def setx(x): goto(x, _y)
 def sety(y): goto(_x, y)
 
 def home():
-    global _angle; goto(0, 0); _angle = 90.0
+    global _angle; goto(0, 0); _angle = 0.0
 
 def setheading(a):
     global _angle; _angle = float(a)
@@ -265,7 +265,7 @@ def bgcolor(c): _push(type='bgcolor', color=c)
 
 def reset():
     global _x,_y,_angle,_pen_down,_pen_color,_fill_color,_pen_width,_visible,_filling,_fill_points
-    _x=_y=0.0; _angle=90.0; _pen_down=True
+    _x=_y=0.0; _angle=0.0; _pen_down=True
     _pen_color='black'; _fill_color='black'; _pen_width=1; _visible=True
     _filling=False; _fill_points=[]
     clear()
