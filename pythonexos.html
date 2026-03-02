@@ -738,6 +738,7 @@ const DEFAULT_JSON = null;
 ═══════════════════════════════════════════════════════════════ */
 let pyodide   = null;
 let exercises = [];
+let rawData   = {}; // objet complet du JSON chargé (pour conserver l'entête à la sauvegarde)
 let current   = null;
 let done      = new Set();
 let userCode  = {}; // { [exercise.id]: string } — sauvegarde le code de chaque exercice
@@ -1056,10 +1057,11 @@ async function loadJson(url) {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error(`HTTP ${resp.status} — ${resp.statusText}`);
     const data = await resp.json();
-    if (!Array.isArray(data)) throw new Error('Le JSON doit être un tableau []');
-    if (data.length === 0) throw new Error('Le fichier JSON est vide');
+    if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit être un objet avec une clé "exercises"');
+    if (data.exercises.length === 0) throw new Error('Le fichier JSON est vide');
 
-    exercises = data;
+    rawData   = data;
+    exercises = data.exercises;
     done      = new Set();
     userCode  = {};
     current   = null;
@@ -1117,9 +1119,10 @@ function loadFromFile(file) {
   reader.onload = e => {
     try {
       const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data)) throw new Error('Le JSON doit être un tableau []');
-      if (data.length === 0) throw new Error('Le fichier JSON est vide');
-      exercises = data;
+      if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit être un objet avec une clé "exercises"');
+      if (data.exercises.length === 0) throw new Error('Le fichier JSON est vide');
+      rawData   = data;
+      exercises = data.exercises;
       done      = new Set();
       userCode  = {};
       current   = null;
@@ -1173,10 +1176,13 @@ function saveAnswers() {
   // S'assurer que le code de l'exercice courant est bien sauvegardé
   if (current) userCode[current.id] = editor.getValue();
 
-  const saved = exercises.map(ex => ({
-    ...ex,
-    starter: userCode[ex.id] ?? ex.starter ?? ''
-  }));
+  const saved = {
+    ...rawData,
+    exercises: exercises.map(ex => ({
+      ...ex,
+      starter: userCode[ex.id] ?? ex.starter ?? ''
+    }))
+  };
 
   const blob     = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
   const url      = URL.createObjectURL(blob);
