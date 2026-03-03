@@ -1326,6 +1326,7 @@ async function doNeonLoad() {
     document.getElementById('save-btn').style.display = 'block';
     document.getElementById('neon-save-btn').style.display = 'block';
     renderList();
+    current = null;
     if (exercises.length > 0) loadEx(exercises[0]);
   } catch(e) {
     msg.className = 'neon-msg err'; msg.textContent = '❌ ' + e.message;
