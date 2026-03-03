@@ -242,14 +242,16 @@ def end_fill():
 def circle(radius, extent=360, steps=None):
     if steps is None:
         steps = max(int(abs(radius)*abs(extent)*math.pi/180/3)+4, 8)
-    step_angle = extent / steps
-    step_len = 2*math.pi*abs(radius)*(abs(extent)/360)/steps
-    sign = 1 if radius >= 0 else -1
-    left(sign*90)
+    w  = float(extent) / steps
+    w2 = w / 2.0
+    l  = 2.0 * radius * math.sin(math.radians(w2))
+    if radius < 0:
+        l, w, w2 = -l, -w, -w2
+    left(w2)
     for _ in range(steps):
-        forward(sign*step_len)
-        left(sign*step_angle)
-    left(-sign*90)
+        forward(l)
+        left(w)
+    left(-w2)
 
 def dot(size=None, *color_args):
     c = color_args[0] if color_args else _pen_color
