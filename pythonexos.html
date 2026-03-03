@@ -1315,17 +1315,18 @@ async function doNeonLoad() {
     
     if (!data) throw new Error(`Aucune sauvegarde trouvée pour "${nom}"${serie ? ` / "${serie}"` : ''}.`);
     if (!Array.isArray(data.exercises)) throw new Error('Format invalide.');
-    rawData = data;
+      rawData = data;
     exercises = data.exercises;
     done = new Set();
     userCode = {};
+    exercises.forEach(ex => { if (ex.starter) userCode[ex.id] = ex.starter; });
     updateTitle();
-    renderList();
-    loadEx(exercises[0]);
+    closeNeonLoadModal();
+    hideUrlScreen();
     document.getElementById('save-btn').style.display = 'block';
     document.getElementById('neon-save-btn').style.display = 'block';
-    closeNeonLoadModal();
-    document.getElementById('url-screen').style.display = 'none';
+    renderList();
+    if (exercises.length > 0) loadEx(exercises[0]);
   } catch(e) {
     msg.className = 'neon-msg err'; msg.textContent = '❌ ' + e.message;
   }
