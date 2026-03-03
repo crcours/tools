@@ -12,9 +12,6 @@
       font-variant-ligatures: none !important;
       font-feature-settings: "liga" 0, "calt" 0 !important;
     }
-    /* ═══════════════════════════════════════════════════════════
-       CATPPUCCIN MOCHA — Design tokens
-    ═══════════════════════════════════════════════════════════ */
     :root {
       --base:    #1e1e2e;
       --mantle:  #181825;
@@ -66,10 +63,7 @@
       flex-shrink: 0;
       z-index: 100;
     }
-    #topbar-logo {
-      font-size: 1.2rem;
-      line-height: 1;
-    }
+    #topbar-logo { font-size: 1.2rem; line-height: 1; }
     #topbar-title {
       font-size: 0.88rem;
       font-weight: 600;
@@ -109,11 +103,8 @@
 
     /* ── BODY LAYOUT ─────────────────────────────────────────── */
     #body-layout {
-      display: none; /* shown by JS */
       flex: 1;
       overflow: hidden;
-    }
-    #body-layout.show {
       display: flex;
     }
 
@@ -406,7 +397,7 @@
       border-left: 3px solid var(--red);
     }
 
-    /* Info panels (hint / solution) */
+    /* Info panels */
     #info-panels { flex-shrink: 0; }
     .ipanel { border-top: 1px solid var(--surface0); }
     .ipanel-hdr {
@@ -443,154 +434,6 @@
       white-space: pre;
     }
 
-    /* ── URL SCREEN ─────────────────────────────────────────────── */
-    #url-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      gap: 18px;
-      padding: 40px 20px;
-      background: var(--base);
-    }
-    #url-screen .url-icon { font-size: 2.8rem; opacity: 0.7; }
-    #url-screen h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--accent);
-    }
-    #url-screen p {
-      color: var(--subtext0);
-      font-size: 0.83rem;
-      text-align: center;
-      max-width: 440px;
-      line-height: 1.6;
-    }
-    #url-screen p code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
-      background: var(--surface0);
-      padding: 1px 5px;
-      border-radius: 3px;
-      color: var(--sky);
-    }
-    #url-form-row {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-      max-width: 520px;
-    }
-    #json-url-inp {
-      flex: 1;
-      background: var(--surface0);
-      border: 1px solid var(--surface1);
-      border-radius: 7px;
-      color: var(--text);
-      padding: 10px 14px;
-      font-size: 0.85rem;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    #json-url-inp:focus { border-color: var(--accent); }
-    #load-json-btn {
-      background: linear-gradient(135deg, #40b35a, #2d9348);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 7px;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(40,163,80,.3);
-      transition: filter 0.15s;
-    }
-    #load-json-btn:hover { filter: brightness(1.1); }
-    #load-err {
-      color: var(--red);
-      font-size: 0.78rem;
-      font-family: 'JetBrains Mono', monospace;
-      min-height: 1em;
-    }
-    .url-examples {
-      text-align: center;
-    }
-    .url-example-tag {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--surface0);
-      border: 1px solid var(--surface1);
-      border-radius: 5px;
-      padding: 4px 10px;
-      color: var(--subtext0);
-      cursor: pointer;
-      margin: 3px;
-      transition: all 0.12s;
-    }
-    .url-example-tag:hover { background: var(--surface1); color: var(--text); }
-
-    /* ── File picker ───────────────────────────────────────────── */
-    .or-sep {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      max-width: 520px;
-      color: var(--overlay0);
-      font-size: 0.75rem;
-    }
-    .or-sep::before, .or-sep::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--surface1);
-    }
-    #file-drop-zone {
-      width: 100%;
-      max-width: 520px;
-      border: 2px dashed var(--surface1);
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--subtext0);
-      font-size: 0.83rem;
-      line-height: 1.6;
-    }
-    #file-drop-zone:hover, #file-drop-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(166,227,161,.05);
-      color: var(--text);
-    }
-    #file-drop-zone .drop-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; opacity: 0.6; }
-    #file-drop-zone strong { color: var(--accent2); }
-    #file-input { display: none; }
-
-    /* ── SCROLLBARS ─────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--surface2); }
-
-    /* ── PROGRESS BAR ───────────────────────────────────────────── */
-    #progress-bar-wrap {
-      height: 2px;
-      background: var(--surface0);
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-    }
-    #progress-bar {
-      height: 100%;
-      background: var(--green);
-      transition: width 0.4s ease;
-    }
     /* ── Neon modals ───────────────────────────────────────────── */
     .neon-modal-backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,.6);
@@ -604,12 +447,12 @@
       box-shadow: 0 8px 40px rgba(0,0,0,.5);
     }
     .neon-modal h3 { font-size: 1rem; font-weight: 700; color: var(--accent); }
-    .neon-modal input, .neon-modal select {
+    .neon-modal input {
       width: 100%; background: var(--surface0); border: 1px solid var(--surface1);
       border-radius: 7px; color: var(--text); padding: 9px 12px;
       font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none;
     }
-    .neon-modal input:focus, .neon-modal select:focus { border-color: var(--accent); }
+    .neon-modal input:focus { border-color: var(--accent); }
     .neon-modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
     .neon-modal-btns button {
       padding: 8px 18px; border-radius: 7px; border: none; cursor: pointer;
@@ -620,6 +463,12 @@
     .neon-msg { font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; min-height: 1em; }
     .neon-msg.err { color: var(--red); }
     .neon-msg.ok  { color: var(--green); }
+
+    /* ── SCROLLBARS ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--surface2); }
   </style>
 </head>
 <body>
@@ -632,7 +481,8 @@
   <button class="topbar-btn" id="save-btn" style="display:none;" onclick="saveAnswers()">💾 Sauvegarder mes réponses</button>
   <button class="topbar-btn" id="neon-save-btn" style="display:none;" onclick="showNeonSaveModal()">☁️ Sauver dans Neon</button>
   <button class="topbar-btn" onclick="showNeonLoadModal()">🗄️ Charger depuis Neon</button>
-  <button class="topbar-btn" onclick="showUrlScreen()">📂 Charger exercices</button>
+  <button class="topbar-btn" onclick="document.getElementById('file-input').click()">📂 Charger exercices</button>
+  <input type="file" id="file-input" accept=".json,application/json" style="display:none;">
 </div>
 
 <!-- ═══ BODY LAYOUT ══════════════════════════════════════════ -->
@@ -652,8 +502,8 @@
 
     <!-- Welcome -->
     <div id="welcome">
-      <div class="w-icon">👈</div>
-      <p>Sélectionnez un exercice dans la liste</p>
+      <div class="w-icon">📂</div>
+      <p>Chargez un fichier d'exercices pour commencer</p>
     </div>
 
     <!-- Exercise view -->
@@ -715,42 +565,6 @@
   </div>
 </div>
 
-<!-- ═══ URL SCREEN ══════════════════════════════════════════= -->
-<div id="url-screen" style="display:none;">
-  <div class="url-icon">📂</div>
-  <h2>Charger des exercices</h2>
-  <p>
-    Entrez l'URL d'un fichier JSON ou chargez-en un depuis votre ordinateur.<br>
-    Vous pouvez aussi ajouter <code>?json=URL</code> dans l'URL de la page.
-  </p>
-
-  <!-- URL input -->
-  <div id="url-form-row">
-    <input type="text" id="json-url-inp"
-           placeholder="https://exemple.com/exercices.json"
-           autocomplete="off" spellcheck="false">
-    <button id="load-json-btn">Charger</button>
-  </div>
-
-  <!-- Or separator -->
-  <div class="or-sep">ou</div>
-
-  <!-- File drop zone -->
-  <div id="file-drop-zone" onclick="document.getElementById('file-input').click()">
-    <span class="drop-icon">📁</span>
-    <strong>Cliquez pour choisir un fichier</strong> ou glissez-déposez ici<br>
-    <span style="font-size:0.72rem;color:var(--overlay0);">Fichier .json uniquement</span>
-  </div>
-  <input type="file" id="file-input" accept=".json,application/json">
-
-  <div id="load-err"></div>
-
-  <div class="url-examples">
-    <p style="font-size:0.72rem;color:var(--overlay0);margin-bottom:6px;">Exemple en ligne :</p>
-    <span class="url-example-tag" onclick="tryExample(this)" data-url="exercices-listes.json">exercices-listes.json (local)</span>
-  </div>
-</div>
-
 <!-- ═══ NEON SAVE MODAL ══════════════════════════════════════ -->
 <div id="neon-save-backdrop" class="neon-modal-backdrop" style="display:none;">
   <div class="neon-modal">
@@ -787,12 +601,10 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   ⚙️  CONFIGURATION — modifiez cette ligne pour pré-charger un JSON
-   Laissez null pour afficher l'écran de chargement au démarrage.
+   ⚙️  CONFIGURATION
 ═══════════════════════════════════════════════════════════════ */
 const DEFAULT_JSON = null;
 // const DEFAULT_JSON = "exercices-listes.json";
-// const DEFAULT_JSON = "https://exemple.com/mes-exercices.json";
 
 /* ═══════════════════════════════════════════════════════════════
    ⚙️  NEON — Connection string
@@ -815,10 +627,10 @@ async function neonQuery(query, params = []) {
 ═══════════════════════════════════════════════════════════════ */
 let pyodide   = null;
 let exercises = [];
-let rawData   = {}; // objet complet du JSON chargé (pour conserver l'entête à la sauvegarde)
+let rawData   = {};
 let current   = null;
 let done      = new Set();
-let userCode  = {}; // { [exercise.id]: string } — sauvegarde le code de chaque exercice
+let userCode  = {};
 
 /* ═══════════════════════════════════════════════════════════════
    CODEMIRROR
@@ -863,7 +675,7 @@ const editor = CodeMirror.fromTextArea(document.getElementById('code-ta'), {
    SIDEBAR & EXERCISE LIST
 ═══════════════════════════════════════════════════════════════ */
 function renderList() {
-  const el   = document.getElementById('ex-list');
+  const el    = document.getElementById('ex-list');
   const diffs = ['easy','easy','medium','medium','hard','hard','hard'];
   const labels = { easy:'Facile', medium:'Moyen', hard:'Difficile' };
   el.innerHTML = '';
@@ -894,46 +706,36 @@ function updateProgress() {
    LOAD EXERCISE
 ═══════════════════════════════════════════════════════════════ */
 function loadEx(ex) {
-  // Sauvegarder le code de l'exercice actuel avant de changer
-  if (current) {
-    userCode[current.id] = editor.getValue();
-  }
+  if (current) userCode[current.id] = editor.getValue();
 
   current = ex;
 
-  // Panels
   document.getElementById('welcome').style.display = 'none';
   const view = document.getElementById('ex-view');
   view.style.display = 'flex';
   view.classList.add('show');
 
-  // Header
-  document.getElementById('ex-head-title').textContent  = `Exercice ${ex.id} — ${ex.title}`;
-  document.getElementById('ex-head-desc').textContent   = ex.description || '';
+  document.getElementById('ex-head-title').textContent = `Exercice ${ex.id} — ${ex.title}`;
+  document.getElementById('ex-head-desc').textContent  = ex.description || '';
   const exEl = document.getElementById('ex-head-example');
   if (ex.example) { exEl.textContent = ex.example; exEl.style.display = 'block'; }
   else              { exEl.style.display = 'none'; }
 
-  // Editor — restaurer le code sauvegardé ou le starter
   editor.setValue(userCode[ex.id] ?? ex.starter ?? '');
   setTimeout(() => editor.refresh(), 20);
 
-  // Reset output
   resetOutput();
 
-  // Info panels
   document.getElementById('hint-body').textContent     = ex.hint     || 'Pas d\'indice disponible.';
   document.getElementById('solution-body').textContent = ex.solution  || 'Pas de corrigé disponible.';
   document.getElementById('hint-panel').classList.remove('open');
   document.getElementById('solution-panel').classList.remove('open');
   document.querySelectorAll('.ipanel-arrow').forEach(a => a.textContent = '▶');
 
-  // Buttons
   const ready = !!pyodide;
   document.getElementById('run-btn').disabled = !ready;
   document.getElementById('val-btn').disabled = !ready;
 
-  // Sidebar highlight
   renderList();
   editor.focus();
 }
@@ -955,7 +757,7 @@ document.getElementById('run-btn').addEventListener('click', () => runCode(false
 document.getElementById('val-btn').addEventListener('click', () => runCode(true));
 document.getElementById('rst-btn').addEventListener('click', () => {
   if (current) {
-    delete userCode[current.id]; // efface la sauvegarde
+    delete userCode[current.id];
     editor.setValue(current.starter || '');
     resetOutput();
     editor.focus();
@@ -989,7 +791,6 @@ async function runCode(validate) {
   valBtn.disabled = false;
 }
 
-/* ── Run raw code ─────────────────────────────────────────────── */
 async function runRaw(code, validate) {
   let stdout = '', stderr = '';
   pyodide.setStdout({ batched: s => { stdout += s + '\n'; } });
@@ -1020,7 +821,6 @@ async function runRaw(code, validate) {
   }
 }
 
-/* ── Run multiple tests ────────────────────────────────────────── */
 async function runTests(tests) {
   const studentCode = editor.getValue();
   let passCount = 0;
@@ -1030,18 +830,15 @@ async function runTests(tests) {
     pyodide.setStdout({ batched: s => { stdout += s + '\n'; } });
     pyodide.setStderr({ batched: s => { stderr += s + '\n'; } });
 
-    // Apply context: replace matching variable lines in student code
     let code = studentCode;
     if (test.context) code = applyContext(code, test.context);
-    // Append optional check code
-    if (test.check) code = code + '\n' + test.check;
+    if (test.check)   code = code + '\n' + test.check;
 
-    let passed = false;
     try {
       await pyodide.runPythonAsync(code);
       const actual   = stdout.trim();
       const expected = String(test.expected).trim();
-      passed = norm(actual) === norm(expected);
+      const passed   = norm(actual) === norm(expected);
 
       if (passed) {
         addOut('out-test-ok', `✓ ${test.label}\n`);
@@ -1065,7 +862,6 @@ async function runTests(tests) {
   if (allPassed) { done.add(current.id); renderList(); }
 }
 
-/* ── Inject context: replace first matching variable declaration ── */
 function applyContext(code, context) {
   let result = code;
   const lines = context.split('\n');
@@ -1079,7 +875,6 @@ function applyContext(code, context) {
   return result;
 }
 
-/* ── Normalize output for comparison ─────────────────────────── */
 function norm(s) {
   return s.trim()
     .replace(/\s+/g, ' ')
@@ -1112,142 +907,51 @@ function togglePanel(id) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   URL / JSON LOADING
+   FILE LOADING
 ═══════════════════════════════════════════════════════════════ */
-function showUrlScreen() {
-  document.getElementById('url-screen').style.display = 'flex';
-  document.getElementById('body-layout').classList.remove('show');
-}
-function hideUrlScreen() {
-  document.getElementById('url-screen').style.display = 'none';
-  document.getElementById('body-layout').classList.add('show');
-}
-
-async function loadJson(url) {
-  const errEl = document.getElementById('load-err');
-  errEl.textContent = '';
-  const btn = document.getElementById('load-json-btn');
-  btn.textContent = '…';
-  btn.disabled = true;
-
-  try {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status} — ${resp.statusText}`);
-    const data = await resp.json();
-    if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit être un objet avec une clé "exercises"');
-    if (data.exercises.length === 0) throw new Error('Le fichier JSON est vide');
-
-    rawData   = data;
-    exercises = data.exercises;
-    done      = new Set();
-    userCode  = {};
-    current   = null;
-    updateTitle();
-    document.getElementById('welcome').style.display = 'flex';
-    document.getElementById('ex-view').classList.remove('show');
-
-    renderList();
-    hideUrlScreen();
-    document.getElementById('save-btn').style.display = 'block';
-    document.getElementById('neon-save-btn').style.display = 'block';
-
-    // Update URL param silently
-    try {
-      const u = new URL(window.location);
-      u.searchParams.set('json', url);
-      history.replaceState({}, '', u);
-    } catch (_) {}
-
-    // Course title
-    if (data[0]?.course_title) {
-      document.getElementById('topbar-title').textContent = data[0].course_title;
-    }
-
-    // Auto-select first exercise
-    if (exercises.length > 0) loadEx(exercises[0]);
-
-  } catch (e) {
-    errEl.textContent = '❌ ' + e.message;
-  } finally {
-    btn.textContent = 'Charger';
-    btn.disabled = false;
-  }
+function loadFromData(data) {
+  if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit avoir une clé "exercises"');
+  if (data.exercises.length === 0)    throw new Error('Le fichier JSON est vide');
+  rawData   = data;
+  exercises = data.exercises;
+  done      = new Set();
+  userCode  = {};
+  exercises.forEach(ex => { if (ex.starter) userCode[ex.id] = ex.starter; });
+  current   = null;
+  updateTitle();
+  document.getElementById('welcome').style.display = 'flex';
+  document.getElementById('ex-view').classList.remove('show');
+  renderList();
+  document.getElementById('save-btn').style.display = 'block';
+  document.getElementById('neon-save-btn').style.display = 'block';
+  if (exercises.length > 0) setTimeout(() => loadEx(exercises[0]), 0);
 }
 
-document.getElementById('load-json-btn').addEventListener('click', () => {
-  const url = document.getElementById('json-url-inp').value.trim();
-  if (url) loadJson(url);
-});
-document.getElementById('json-url-inp').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('load-json-btn').click();
-});
-
-function tryExample(el) {
-  document.getElementById('json-url-inp').value = el.dataset.url;
-  document.getElementById('load-json-btn').click();
-}
-
-/* ── Local file loading ────────────────────────────────────── */
-function loadFromFile(file) {
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
   if (!file) return;
-  if (!file.name.endsWith('.json') && file.type !== 'application/json') {
-    document.getElementById('load-err').textContent = '❌ Le fichier doit être un .json';
-    return;
-  }
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = ev => {
     try {
-      const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit être un objet avec une clé "exercises"');
-      if (data.exercises.length === 0) throw new Error('Le fichier JSON est vide');
-      rawData   = data;
-      exercises = data.exercises;
-      done      = new Set();
-      userCode  = {};
-      current   = null;
-      updateTitle();
-      document.getElementById('welcome').style.display = 'flex';
-      document.getElementById('ex-view').classList.remove('show');
-      renderList();
-      hideUrlScreen();
-      document.getElementById('save-btn').style.display = 'block';
-      document.getElementById('neon-save-btn').style.display = 'block';
-      if (exercises.length > 0) setTimeout(() => loadEx(exercises[0]), 0);
+      loadFromData(JSON.parse(ev.target.result));
     } catch (err) {
-      document.getElementById('load-err').textContent = '❌ ' + err.message;
+      alert('❌ ' + err.message);
     }
-  };
-  reader.onerror = () => {
-    document.getElementById('load-err').textContent = '❌ Impossible de lire le fichier';
   };
   reader.readAsText(file);
+  e.target.value = '';
+});
+
+async function loadJson(url) {
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    loadFromData(await resp.json());
+  } catch (e) {
+    console.error('loadJson error:', e);
+  }
 }
 
-// File input change
-document.getElementById('file-input').addEventListener('change', e => {
-  loadFromFile(e.target.files[0]);
-  e.target.value = ''; // reset so same file can be reloaded
-});
-
-// Drag & drop
-const dropZone = document.getElementById('file-drop-zone');
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('drag-over');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  loadFromFile(file);
-});
-
-/* ═══════════════════════════════════════════════════════════════
-   SAVE ANSWERS
-   Génère un JSON identique à l'original mais avec le code de
-   l'élève dans le champ "starter" de chaque exercice.
-═══════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════
    NEON — Sauvegarde & chargement
 ═══════════════════════════════════════════════════════════════ */
@@ -1267,7 +971,6 @@ async function doNeonSave() {
   if (!nom) { msg.className = 'neon-msg err'; msg.textContent = '❌ Entrez un nom.'; return; }
   if (current) userCode[current.id] = editor.getValue();
   const saved = { ...rawData, exercises: exercises.map(ex => ({ ...ex, starter: userCode[ex.id] ?? ex.starter ?? '' })) };
-  // Injecte le nom dans le JSON
   saved.eleve = nom;
   msg.className = 'neon-msg'; msg.textContent = '⏳ Sauvegarde…';
   try {
@@ -1308,29 +1011,33 @@ async function doNeonLoad() {
       params = [nom];
     }
     const res  = await neonQuery(query, params);
-    console.log("res brut:", JSON.stringify(res));
-    
     const data = res?.[0]?.data;
-
-    
     if (!data) throw new Error(`Aucune sauvegarde trouvée pour "${nom}"${serie ? ` / "${serie}"` : ''}.`);
-    if (!Array.isArray(data.exercises)) throw new Error('Format invalide.');
-      rawData = data;
-    exercises = data.exercises;
-    done = new Set();
-    userCode = {};
-    exercises.forEach(ex => { if (ex.starter) userCode[ex.id] = ex.starter; });
-    updateTitle();
+    loadFromData(data);
     closeNeonLoadModal();
-    hideUrlScreen();
-    document.getElementById('save-btn').style.display = 'block';
-    document.getElementById('neon-save-btn').style.display = 'block';
-    renderList();
-    current = null;
-    if (exercises.length > 0) loadEx(exercises[0]);
   } catch(e) {
     msg.className = 'neon-msg err'; msg.textContent = '❌ ' + e.message;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SAVE ANSWERS
+═══════════════════════════════════════════════════════════════ */
+function saveAnswers() {
+  if (current) userCode[current.id] = editor.getValue();
+  const saved = {
+    ...rawData,
+    exercises: exercises.map(ex => ({ ...ex, starter: userCode[ex.id] ?? ex.starter ?? '' }))
+  };
+  const blob = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const now  = new Date();
+  const ts   = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  a.href     = url;
+  a.download = `reponses-${ts}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function updateTitle() {
@@ -1338,49 +1045,17 @@ function updateTitle() {
   document.getElementById('topbar-title').textContent = serie ? serie : 'Python — Exercices Interactifs';
 }
 
-function saveAnswers() {
-  // S'assurer que le code de l'exercice courant est bien sauvegardé
-  if (current) userCode[current.id] = editor.getValue();
-
-  const saved = {
-    ...rawData,
-    exercises: exercises.map(ex => ({
-      ...ex,
-      starter: userCode[ex.id] ?? ex.starter ?? ''
-    }))
-  };
-
-  const blob     = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
-  const url      = URL.createObjectURL(blob);
-  const a        = document.createElement('a');
-  const now      = new Date();
-  const ts       = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
-  a.href         = url;
-  a.download     = `reponses-${ts}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 function esc(s) {
   return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   INIT — priorité : ?json= dans l'URL > DEFAULT_JSON > écran
+   INIT
 ═══════════════════════════════════════════════════════════════ */
 const params    = new URLSearchParams(window.location.search);
 const jsonParam = params.get('json');
-
-// Priorité : 1) ?json= dans l'URL  2) DEFAULT_JSON dans le code  3) écran de chargement
-const autoUrl = jsonParam || DEFAULT_JSON;
-
-document.getElementById('body-layout').classList.add('show');
-if (autoUrl) {
-  document.getElementById('json-url-inp').value = autoUrl;
-  loadJson(autoUrl);
-} else {
-  document.getElementById('body-layout').classList.remove('show');
-  showUrlScreen();
-}
+const autoUrl   = jsonParam || DEFAULT_JSON;
+if (autoUrl) loadJson(autoUrl);
 </script>
 </body>
 </html>
