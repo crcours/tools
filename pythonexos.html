@@ -1309,8 +1309,8 @@ async function doNeonLoad() {
     }
     const res  = await neonQuery(query, params);
     console.log("res brut:", JSON.stringify(res));
-    const data = JSON.parse(res?.rows?.[0]?.[0]);
     
+    const data = res?.[0]?.data;
 
     
     if (!data) throw new Error(`Aucune sauvegarde trouvée pour "${nom}"${serie ? ` / "${serie}"` : ''}.`);
