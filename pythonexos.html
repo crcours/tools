@@ -1308,7 +1308,7 @@ async function doNeonLoad() {
       params = [nom];
     }
     const res  = await neonQuery(query, params);
-    const data = res?.[0]?.data;
+    const data = JSON.parse(res?.rows?.[0]?.[0]);
     if (!data) throw new Error(`Aucune sauvegarde trouvée pour "${nom}"${serie ? ` / "${serie}"` : ''}.`);
     if (!Array.isArray(data.exercises)) throw new Error('Format invalide.');
     rawData = data;
