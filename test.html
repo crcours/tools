@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Python — Exercices Interactifs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <style>
+    .CodeMirror, .CodeMirror * {
+      font-variant-ligatures: none !important;
+      font-feature-settings: "liga" 0, "calt" 0 !important;
+    }
+    :root {
+      --base:    #1e1e2e;
+      --mantle:  #181825;
+      --crust:   #11111b;
+      --surface0:#313244;
+      --surface1:#45475a;
+      --surface2:#585b70;
+      --overlay0:#6c7086;
+      --overlay1:#7f849c;
+      --text:    #cdd6f4;
+      --subtext1:#bac2de;
+      --subtext0:#a6adc8;
+      --green:   #a6e3a1;
+      --teal:    #94e2d5;
+      --sky:     #89dceb;
+      --sapphire:#74c7ec;
+      --blue:    #89b4fa;
+      --mauve:   #cba6f7;
+      --pink:    #f5c2e7;
+      --red:     #f38ba8;
+      --peach:   #fab387;
+      --yellow:  #f9e2af;
+      --accent:  #a6e3a1;
+      --accent2: #74c7ec;
+      --border:  #313244;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--base);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+
+    /* ── TOPBAR ───────────────────────────────────────────────── */
+    #topbar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      background: var(--mantle);
+      border-bottom: 1px solid var(--surface0);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    #topbar-logo { font-size: 1.2rem; line-height: 1; }
+    #topbar-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #pyodide-status {
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 9px;
+      border-radius: 4px;
+      background: var(--surface0);
+      border: 1px solid var(--surface1);
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+    #pyodide-status.loading { color: var(--yellow); }
+    #pyodide-status.ready   { color: var(--green); }
+    #pyodide-status.error   { color: var(--red); }
+    .topbar-btn {
+      font-size: 0.72rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 5px;
+      background: var(--surface0);
+      color: var(--subtext1);
+      border: 1px solid var(--surface1);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .topbar-btn:hover { background: var(--surface1); color: var(--text); }
+
+    /* ── BODY LAYOUT ─────────────────────────────────────────── */
+    #body-layout {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────────── */
+    #sidebar {
+      width: 230px;
+      min-width: 230px;
+      background: var(--mantle);
+      border-right: 1px solid var(--surface0);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #sidebar-header {
+      padding: 10px 13px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--overlay0);
+      border-bottom: 1px solid var(--surface0);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #sidebar-header span {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--overlay1);
+      background: var(--surface0);
+      border-radius: 10px;
+      padding: 1px 8px;
+    }
+    #ex-list { overflow-y: auto; flex: 1; }
+    .ex-row {
+      padding: 10px 13px;
+      border-bottom: 1px solid var(--crust);
+      cursor: pointer;
+      transition: background 0.1s;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    .ex-row:hover { background: var(--surface0); }
+    .ex-row.active {
+      background: rgba(166,227,161,0.05);
+      border-left-color: var(--green);
+    }
+    .ex-row-num {
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--overlay0);
+      margin-bottom: 2px;
+    }
+    .ex-row-title {
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--subtext1);
+    }
+    .ex-row.active .ex-row-title { color: var(--text); }
+    .ex-row-tag {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 0.58rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tag-easy   { background: rgba(166,227,161,.12); color: var(--green);   border: 1px solid rgba(166,227,161,.25); }
+    .tag-medium { background: rgba(249,226,175,.12); color: var(--yellow);  border: 1px solid rgba(249,226,175,.25); }
+    .tag-hard   { background: rgba(243,139,168,.12); color: var(--red);     border: 1px solid rgba(243,139,168,.25); }
+    .tag-done   { background: rgba(137,220,235,.12); color: var(--sky);     border: 1px solid rgba(137,220,235,.25); }
+
+    /* ── MAIN ─────────────────────────────────────────────────── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* Welcome */
+    #welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--overlay0);
+    }
+    #welcome .w-icon { font-size: 3rem; opacity: 0.5; }
+    #welcome p { font-size: 0.88rem; }
+
+    /* Exercise view */
+    #ex-view {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #ex-view.show { display: flex; }
+
+    /* ── EX HEADER ─────────────────────────────────────────────── */
+    #ex-head {
+      padding: 12px 16px;
+      background: var(--mantle);
+      border-bottom: 1px solid var(--surface0);
+      flex-shrink: 0;
+    }
+    #ex-head-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    #ex-head-desc {
+      font-size: 0.82rem;
+      color: var(--subtext0);
+      line-height: 1.5;
+    }
+    #ex-head-example {
+      display: none;
+      margin-top: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--green);
+      background: rgba(166,227,161,.07);
+      padding: 5px 10px;
+      border-radius: 5px;
+      border-left: 2px solid var(--green);
+    }
+
+    /* ── EDITOR + OUTPUT SPLIT ─────────────────────────────────── */
+    #editor-output {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── EDITOR COLUMN ─────────────────────────────────────────── */
+    #editor-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--surface0);
+      min-width: 0;
+    }
+    #editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      background: var(--crust);
+      border-bottom: 1px solid var(--surface0);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .tbtn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 5px 13px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: filter 0.12s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .tbtn:hover:not(:disabled) { filter: brightness(1.15); }
+    .tbtn:active:not(:disabled) { transform: scale(0.96); }
+    .tbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .tbtn-run {
+      background: linear-gradient(135deg, #40b35a, #2d9348);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(40,163,80,.3);
+    }
+    .tbtn-val {
+      background: linear-gradient(135deg, #5b9cf5, #3a7de0);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(89,140,245,.3);
+    }
+    .tbtn-rst {
+      background: var(--surface0);
+      color: var(--subtext0);
+      border: 1px solid var(--surface1);
+    }
+    #timing {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--overlay1);
+      margin-left: auto;
+    }
+    #hint-kbd {
+      font-size: 0.68rem;
+      color: var(--overlay0);
+      margin-left: 2px;
+    }
+
+    /* CodeMirror */
+    #cm-wrap { flex: 1; overflow: hidden; position: relative; }
+    .CodeMirror {
+      height: 100%;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 13.5px;
+      line-height: 21px;
+    }
+    .CodeMirror-scroll { height: 100%; }
+    .CodeMirror-gutters { background: var(--crust); border-right: 1px solid var(--surface0); }
+    .CodeMirror-linenumber { color: var(--surface2); font-size: 12px; }
+    .CodeMirror-activeline-background { background: rgba(255,255,255,.03) !important; }
+    .cm-s-mocha.CodeMirror { background: #1e1e2e; color: #cdd6f4; }
+    .cm-s-mocha .cm-keyword   { color: #cba6f7; font-weight: 600; }
+    .cm-s-mocha .cm-operator  { color: #89dceb; }
+    .cm-s-mocha .cm-builtin   { color: #89b4fa; }
+    .cm-s-mocha .cm-def       { color: #a6e3a1; font-weight: 600; }
+    .cm-s-mocha .cm-variable  { color: #cdd6f4; }
+    .cm-s-mocha .cm-variable-2{ color: #cdd6f4; }
+    .cm-s-mocha .cm-string    { color: #a6e3a1; }
+    .cm-s-mocha .cm-string-2  { color: #a6e3a1; }
+    .cm-s-mocha .cm-number    { color: #fab387; }
+    .cm-s-mocha .cm-comment   { color: #6c7086; font-style: italic; }
+    .cm-s-mocha .cm-atom      { color: #fab387; }
+    .cm-s-mocha .cm-error     { color: #f38ba8; }
+    .cm-s-mocha .CodeMirror-cursor   { border-left: 2px solid #cdd6f4; }
+    .cm-s-mocha .CodeMirror-selected { background: rgba(69,71,90,.6); }
+
+    /* ── OUTPUT COLUMN ─────────────────────────────────────────── */
+    #output-col {
+      width: 310px;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--crust);
+    }
+    #out-header {
+      padding: 7px 12px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--overlay0);
+      background: var(--mantle);
+      border-bottom: 1px solid var(--surface0);
+      flex-shrink: 0;
+    }
+    #output-console {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .out-stdout { color: #c9f5c9; }
+    .out-stderr { color: #fab387; }
+    .out-error  { color: #f38ba8; }
+    .out-info   { color: var(--surface2); font-style: italic; }
+    .out-test-ok   { color: var(--green); }
+    .out-test-fail { color: var(--red); }
+
+    /* Validation banner */
+    #val-banner {
+      display: none;
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      border-top: 1px solid var(--surface0);
+      line-height: 1.4;
+    }
+    #val-banner.pass {
+      background: rgba(166,227,161,.08);
+      color: var(--green);
+      border-left: 3px solid var(--green);
+    }
+    #val-banner.fail {
+      background: rgba(243,139,168,.08);
+      color: var(--red);
+      border-left: 3px solid var(--red);
+    }
+
+    /* Info panels */
+    #info-panels { flex-shrink: 0; }
+    .ipanel { border-top: 1px solid var(--surface0); }
+    .ipanel-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--subtext0);
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .ipanel-hdr:hover { background: var(--surface0); color: var(--text); }
+    .ipanel-arrow { transition: transform 0.2s; font-size: 0.6rem; color: var(--overlay0); }
+    .ipanel.open .ipanel-arrow { transform: rotate(90deg); }
+    .ipanel-body {
+      display: none;
+      max-height: 190px;
+      overflow-y: auto;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      background: var(--base);
+      border-top: 1px solid var(--surface0);
+    }
+    .ipanel.open .ipanel-body { display: block; }
+    #hint-body  { color: var(--yellow); }
+    #solution-body {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--peach);
+      white-space: pre;
+    }
+
+    /* ── Neon modals ───────────────────────────────────────────── */
+    .neon-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .neon-modal {
+      background: var(--mantle); border: 1px solid var(--surface1);
+      border-radius: 12px; padding: 28px 32px; width: 380px;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    }
+    .neon-modal h3 { font-size: 1rem; font-weight: 700; color: var(--accent); }
+    .neon-modal input {
+      width: 100%; background: var(--surface0); border: 1px solid var(--surface1);
+      border-radius: 7px; color: var(--text); padding: 9px 12px;
+      font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none;
+    }
+    .neon-modal input:focus { border-color: var(--accent); }
+    .neon-modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+    .neon-modal-btns button {
+      padding: 8px 18px; border-radius: 7px; border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+    }
+    .btn-cancel { background: var(--surface1); color: var(--text); }
+    .btn-confirm { background: linear-gradient(135deg,#40b35a,#2d9348); color: #fff; }
+    .neon-msg { font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; min-height: 1em; }
+    .neon-msg.err { color: var(--red); }
+    .neon-msg.ok  { color: var(--green); }
+
+    /* ── SCROLLBARS ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--surface2); }
+  </style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══════════════════════════════════════════════ -->
+<div id="topbar">
+  <span id="topbar-logo">🐍</span>
+  <span id="topbar-title">Python — Exercices Interactifs</span>
+  <div id="pyodide-status" class="loading">⏳ Chargement Python…</div>
+  <button class="topbar-btn" id="save-btn" style="display:none;" onclick="saveAnswers()">💾 Sauvegarder mes réponses</button>
+  <button class="topbar-btn" id="neon-save-btn" style="display:none;" onclick="showNeonSaveModal()">☁️ Sauver dans Neon</button>
+  <button class="topbar-btn" onclick="showNeonLoadModal()">🗄️ Charger depuis Neon</button>
+  <button class="topbar-btn" onclick="document.getElementById('file-input').click()">📂 Charger exercices</button>
+  <input type="file" id="file-input" accept=".json,application/json" style="display:none;">
+</div>
+
+<!-- ═══ BODY LAYOUT ══════════════════════════════════════════ -->
+<div id="body-layout">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-header">
+      Exercices
+      <span id="progress-label">0/0</span>
+    </div>
+    <div id="ex-list"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- Welcome -->
+    <div id="welcome">
+      <div class="w-icon">📂</div>
+      <p>Chargez un fichier d'exercices pour commencer</p>
+    </div>
+
+    <!-- Exercise view -->
+    <div id="ex-view">
+
+      <!-- Header -->
+      <div id="ex-head">
+        <div id="ex-head-title"></div>
+        <div id="ex-head-desc"></div>
+        <div id="ex-head-example"></div>
+      </div>
+
+      <!-- Editor + Output -->
+      <div id="editor-output">
+
+        <!-- Editor column -->
+        <div id="editor-col">
+          <div id="editor-toolbar">
+            <button class="tbtn tbtn-run" id="run-btn" disabled>▶ Exécuter</button>
+            <button class="tbtn tbtn-val" id="val-btn" disabled>✔ Valider</button>
+            <button class="tbtn tbtn-rst" id="rst-btn">↺ Reset</button>
+            <span id="hint-kbd">Ctrl+↵ pour exécuter</span>
+            <span id="timing"></span>
+          </div>
+          <div id="cm-wrap">
+            <textarea id="code-ta"></textarea>
+          </div>
+        </div>
+
+        <!-- Output column -->
+        <div id="output-col">
+          <div id="out-header">📤 Sortie console</div>
+          <div id="output-console"><span class="out-info">En attente d'exécution…</span></div>
+          <div id="val-banner"></div>
+          <div id="info-panels">
+            <div class="ipanel" id="hint-panel">
+              <div class="ipanel-hdr" onclick="togglePanel('hint-panel')">
+                <span>💡 Indice</span>
+                <span class="ipanel-arrow">▶</span>
+              </div>
+              <div class="ipanel-body">
+                <div id="hint-body"></div>
+              </div>
+            </div>
+            <div class="ipanel" id="solution-panel">
+              <div class="ipanel-hdr" onclick="togglePanel('solution-panel')">
+                <span>🔑 Corrigé</span>
+                <span class="ipanel-arrow">▶</span>
+              </div>
+              <div class="ipanel-body">
+                <pre id="solution-body"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEON SAVE MODAL ══════════════════════════════════════ -->
+<div id="neon-save-backdrop" class="neon-modal-backdrop" style="display:none;">
+  <div class="neon-modal">
+    <h3>☁️ Sauvegarder dans Neon</h3>
+    <input type="text" id="neon-nom-inp" placeholder="Nom de l'élève" autocomplete="off">
+    <div id="neon-save-msg" class="neon-msg"></div>
+    <div class="neon-modal-btns">
+      <button class="btn-cancel" onclick="closeNeonSaveModal()">Annuler</button>
+      <button class="btn-confirm" onclick="doNeonSave()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NEON LOAD MODAL ══════════════════════════════════════ -->
+<div id="neon-load-backdrop" class="neon-modal-backdrop" style="display:none;">
+  <div class="neon-modal">
+    <h3>🗄️ Charger depuis Neon</h3>
+    <input type="text" id="neon-load-nom" placeholder="Nom de l'élève" autocomplete="off">
+    <div id="neon-load-msg" class="neon-msg"></div>
+    <div class="neon-modal-btns">
+      <button class="btn-cancel" onclick="closeNeonLoadModal()">Annuler</button>
+      <button class="btn-confirm" onclick="doNeonLoad()">Charger</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ══════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ⚙️  CONFIGURATION
+═══════════════════════════════════════════════════════════════ */
+const DEFAULT_JSON = null;
+// const DEFAULT_JSON = "exercices-listes.json";
+
+/* ═══════════════════════════════════════════════════════════════
+   ⚙️  NEON — Connection string
+═══════════════════════════════════════════════════════════════ */
+const NEON_CONNECTION = "postgresql://eleve_user:B123%2B%26%2F%25%2A%C3%A9%C3%A9@ep-blue-bird-alox500p-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+let _neonSql = null;
+async function getNeonSql() {
+  if (_neonSql) return _neonSql;
+  const { neon } = await import('https://esm.sh/@neondatabase/serverless');
+  _neonSql = neon(NEON_CONNECTION);
+  return _neonSql;
+}
+async function neonQuery(query, params = []) {
+  const sql = await getNeonSql();
+  return sql.query(query, params);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════════════════════════ */
+let pyodide   = null;
+let exercises = [];
+let rawData   = {};
+let current   = null;
+let done      = new Set();
+let userCode  = {};
+
+/* ═══════════════════════════════════════════════════════════════
+   CODEMIRROR
+═══════════════════════════════════════════════════════════════ */
+const editor = CodeMirror.fromTextArea(document.getElementById('code-ta'), {
+  mode: 'python',
+  theme: 'mocha',
+  lineNumbers: true,
+  indentUnit: 4,
+  tabSize: 4,
+  indentWithTabs: false,
+  matchBrackets: true,
+  autoCloseBrackets: true,
+  styleActiveLine: true,
+  extraKeys: {
+    'Tab':       cm => cm.execCommand('indentMore'),
+    'Shift-Tab': cm => cm.execCommand('indentLess'),
+    'Ctrl-Enter': () => { if (!document.getElementById('run-btn').disabled) runCode(false); }
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PYODIDE INIT
+═══════════════════════════════════════════════════════════════ */
+(async () => {
+  const st = document.getElementById('pyodide-status');
+  try {
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
+    st.textContent = '✅ Python 3.11 prêt';
+    st.className   = 'ready';
+    if (current) {
+      document.getElementById('run-btn').disabled = false;
+      document.getElementById('val-btn').disabled = false;
+    }
+  } catch (e) {
+    st.textContent = '❌ Erreur Pyodide';
+    st.className   = 'error';
+  }
+})();
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR & EXERCISE LIST
+═══════════════════════════════════════════════════════════════ */
+function renderList() {
+  const el    = document.getElementById('ex-list');
+  const diffs = ['easy','easy','medium','medium','hard','hard','hard'];
+  const labels = { easy:'Facile', medium:'Moyen', hard:'Difficile' };
+  el.innerHTML = '';
+  exercises.forEach((ex, i) => {
+    const diff   = ex.difficulty || diffs[i] || 'medium';
+    const isDone = done.has(ex.id);
+    const div    = document.createElement('div');
+    div.className = 'ex-row' + (current?.id === ex.id ? ' active' : '');
+    div.dataset.id = ex.id;
+    div.innerHTML = `
+      <div class="ex-row-num">Exercice ${ex.id}</div>
+      <div class="ex-row-title">${esc(ex.title)}</div>
+      <span class="ex-row-tag ${isDone ? 'tag-done' : 'tag-' + diff}">${isDone ? '✓ Réussi' : labels[diff] || diff}</span>
+    `;
+    div.addEventListener('click', () => loadEx(ex));
+    el.appendChild(div);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = exercises.length;
+  const n     = done.size;
+  document.getElementById('progress-label').textContent = `${n}/${total}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOAD EXERCISE
+═══════════════════════════════════════════════════════════════ */
+function loadEx(ex) {
+  if (current) userCode[current.id] = editor.getValue();
+
+  current = ex;
+
+  document.getElementById('welcome').style.display = 'none';
+  const view = document.getElementById('ex-view');
+  view.style.display = 'flex';
+  view.classList.add('show');
+
+  document.getElementById('ex-head-title').textContent = `Exercice ${ex.id} — ${ex.title}`;
+  document.getElementById('ex-head-desc').textContent  = ex.description || '';
+  const exEl = document.getElementById('ex-head-example');
+  if (ex.example) { exEl.textContent = ex.example; exEl.style.display = 'block'; }
+  else              { exEl.style.display = 'none'; }
+
+  editor.setValue(userCode[ex.id] ?? ex.starter ?? '');
+  setTimeout(() => editor.refresh(), 20);
+
+  resetOutput();
+
+  document.getElementById('hint-body').textContent     = ex.hint     || 'Pas d\'indice disponible.';
+  document.getElementById('solution-body').textContent = ex.solution  || 'Pas de corrigé disponible.';
+  document.getElementById('hint-panel').classList.remove('open');
+  document.getElementById('solution-panel').classList.remove('open');
+  document.querySelectorAll('.ipanel-arrow').forEach(a => a.textContent = '▶');
+
+  const ready = !!pyodide;
+  document.getElementById('run-btn').disabled = !ready;
+  document.getElementById('val-btn').disabled = !ready;
+
+  renderList();
+  editor.focus();
+}
+
+function resetOutput() {
+  document.getElementById('output-console').innerHTML =
+    '<span class="out-info">En attente d\'exécution…</span>';
+  document.getElementById('timing').textContent = '';
+  const vb = document.getElementById('val-banner');
+  vb.style.display = 'none';
+  vb.className = '';
+  vb.textContent = '';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RUN & VALIDATE
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('run-btn').addEventListener('click', () => runCode(false));
+document.getElementById('val-btn').addEventListener('click', () => runCode(true));
+document.getElementById('rst-btn').addEventListener('click', () => {
+  if (current) {
+    delete userCode[current.id];
+    editor.setValue(current.starter || '');
+    resetOutput();
+    editor.focus();
+  }
+});
+
+async function runCode(validate) {
+  if (!pyodide || !current) return;
+
+  const runBtn = document.getElementById('run-btn');
+  const valBtn = document.getElementById('val-btn');
+  runBtn.disabled = true;
+  valBtn.disabled = true;
+
+  document.getElementById('output-console').innerHTML = '';
+  document.getElementById('timing').textContent = '';
+  document.getElementById('val-banner').style.display = 'none';
+
+  const t0 = performance.now();
+
+  if (validate && current.tests?.length > 0) {
+    await runTests(current.tests);
+  } else {
+    await runRaw(editor.getValue(), validate);
+  }
+
+  document.getElementById('timing').textContent =
+    `${((performance.now() - t0) / 1000).toFixed(3)}s`;
+
+  runBtn.disabled = false;
+  valBtn.disabled = false;
+}
+
+async function runRaw(code, validate) {
+  let stdout = '', stderr = '';
+  pyodide.setStdout({ batched: s => { stdout += s + '\n'; } });
+  pyodide.setStderr({ batched: s => { stderr += s + '\n'; } });
+
+  try {
+    await pyodide.runPythonAsync(code);
+  } catch (e) {
+    if (stdout) addOut('out-stdout', stdout);
+    if (stderr) addOut('out-stderr', stderr);
+    addOut('out-error', e.message);
+    if (validate) showBanner(false, '❌ Erreur lors de l\'exécution.');
+    return;
+  }
+
+  if (stdout) addOut('out-stdout', stdout);
+  if (stderr) addOut('out-stderr', stderr);
+  if (!stdout && !stderr) addOut('out-info', '(aucune sortie)');
+
+  if (validate && current.expected_output !== undefined) {
+    const actual   = stdout.trim();
+    const expected = String(current.expected_output).trim();
+    const pass     = norm(actual) === norm(expected);
+    if (!pass) addOut('out-info', `\nAttendu : ${expected}\nObtenu  : ${actual || '(vide)'}`);
+    showBanner(pass,
+      pass ? '✅ Bravo ! Résultat correct.' : '❌ Résultat incorrect. Vérifiez votre code.');
+    if (pass) { done.add(current.id); renderList(); }
+  }
+}
+
+async function runTests(tests) {
+  const studentCode = editor.getValue();
+  let passCount = 0;
+
+  for (const test of tests) {
+    let stdout = '', stderr = '';
+    pyodide.setStdout({ batched: s => { stdout += s + '\n'; } });
+    pyodide.setStderr({ batched: s => { stderr += s + '\n'; } });
+
+    let code = studentCode;
+    if (test.context) code = applyContext(code, test.context);
+    if (test.check)   code = code + '\n' + test.check;
+
+    try {
+      await pyodide.runPythonAsync(code);
+      const actual   = stdout.trim();
+      const expected = String(test.expected).trim();
+      const passed   = norm(actual) === norm(expected);
+
+      if (passed) {
+        addOut('out-test-ok', `✓ ${test.label}\n`);
+        passCount++;
+      } else {
+        addOut('out-test-fail', `✗ ${test.label}\n`);
+        addOut('out-info', `  Attendu : ${expected}\n  Obtenu  : ${actual || '(vide)'}\n\n`);
+      }
+    } catch (e) {
+      addOut('out-test-fail', `✗ ${test.label} — Erreur\n`);
+      addOut('out-error', `  ${e.message}\n\n`);
+    }
+  }
+
+  const allPassed = passCount === tests.length;
+  showBanner(allPassed,
+    allPassed
+      ? `✅ Parfait ! ${passCount}/${tests.length} tests réussis.`
+      : `❌ ${passCount}/${tests.length} tests réussis. Continuez !`
+  );
+  if (allPassed) { done.add(current.id); renderList(); }
+}
+
+function applyContext(code, context) {
+  let result = code;
+  const lines = context.split('\n');
+  for (const line of lines) {
+    const m = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=/);
+    if (m) {
+      const re = new RegExp(`^${m[1]}\\s*=.*$`, 'm');
+      if (re.test(result)) result = result.replace(re, line.trim());
+    }
+  }
+  return result;
+}
+
+function norm(s) {
+  return s.trim()
+    .replace(/\s+/g, ' ')
+    .replace(/\[\s*/g, '[').replace(/\s*\]/g, ']')
+    .replace(/,\s*/g, ', ');
+}
+
+function showBanner(pass, msg) {
+  const vb = document.getElementById('val-banner');
+  vb.className = pass ? 'pass' : 'fail';
+  vb.textContent = msg;
+  vb.style.display = 'block';
+}
+
+function addOut(cls, text) {
+  const span = document.createElement('span');
+  span.className = cls;
+  span.textContent = text;
+  document.getElementById('output-console').appendChild(span);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INFO PANELS TOGGLE
+═══════════════════════════════════════════════════════════════ */
+function togglePanel(id) {
+  const panel = document.getElementById(id);
+  panel.classList.toggle('open');
+  const arrow = panel.querySelector('.ipanel-arrow');
+  arrow.textContent = panel.classList.contains('open') ? '▼' : '▶';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILE LOADING
+═══════════════════════════════════════════════════════════════ */
+function loadFromData(data) {
+  if (!Array.isArray(data.exercises)) throw new Error('Le JSON doit avoir une clé "exercises"');
+  if (data.exercises.length === 0)    throw new Error('Le fichier JSON est vide');
+  rawData   = data;
+  exercises = data.exercises;
+  done      = new Set();
+  userCode  = {};
+  exercises.forEach(ex => { if (ex.starter) userCode[ex.id] = ex.starter; });
+  current   = null;
+  updateTitle();
+  document.getElementById('welcome').style.display = 'flex';
+  document.getElementById('ex-view').classList.remove('show');
+  renderList();
+  document.getElementById('save-btn').style.display = 'block';
+  document.getElementById('neon-save-btn').style.display = 'block';
+  if (exercises.length > 0) setTimeout(() => loadEx(exercises[0]), 0);
+}
+
+document.getElementById('file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      loadFromData(JSON.parse(ev.target.result));
+    } catch (err) {
+      alert('❌ ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+async function loadJson(url) {
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    loadFromData(await resp.json());
+  } catch (e) {
+    console.error('loadJson error:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NEON — Sauvegarde & chargement
+═══════════════════════════════════════════════════════════════ */
+function showNeonSaveModal() {
+  document.getElementById('neon-save-msg').textContent = '';
+  document.getElementById('neon-save-msg').className = 'neon-msg';
+  document.getElementById('neon-nom-inp').value = '';
+  document.getElementById('neon-save-backdrop').style.display = 'flex';
+  setTimeout(() => document.getElementById('neon-nom-inp').focus(), 50);
+}
+function closeNeonSaveModal() {
+  document.getElementById('neon-save-backdrop').style.display = 'none';
+}
+async function doNeonSave() {
+  const nom = document.getElementById('neon-nom-inp').value.trim();
+  const msg = document.getElementById('neon-save-msg');
+  if (!nom) { msg.className = 'neon-msg err'; msg.textContent = '❌ Entrez un nom.'; return; }
+  if (current) userCode[current.id] = editor.getValue();
+  const saved = { ...rawData, exercises: exercises.map(ex => ({ ...ex, starter: userCode[ex.id] ?? ex.starter ?? '' })) };
+  saved.eleve = nom;
+  msg.className = 'neon-msg'; msg.textContent = '⏳ Sauvegarde…';
+  try {
+    await neonQuery(
+      `INSERT INTO reponses (data) VALUES ($1::jsonb)`,
+      [JSON.stringify(saved)]
+    );
+    msg.className = 'neon-msg ok'; msg.textContent = `✅ Sauvegardé sous "${nom}" !`;
+    setTimeout(closeNeonSaveModal, 1500);
+  } catch(e) {
+    msg.className = 'neon-msg err'; msg.textContent = '❌ ' + e.message;
+  }
+}
+
+async function showNeonLoadModal() {
+  document.getElementById('neon-load-nom').value = '';
+  document.getElementById('neon-load-msg').textContent = '';
+  document.getElementById('neon-load-msg').className = 'neon-msg';
+  document.getElementById('neon-load-backdrop').style.display = 'flex';
+  setTimeout(() => document.getElementById('neon-load-nom').focus(), 50);
+}
+function closeNeonLoadModal() {
+  document.getElementById('neon-load-backdrop').style.display = 'none';
+}
+async function doNeonLoad() {
+  const nom   = document.getElementById('neon-load-nom').value.trim();
+  const serie = rawData?.globalInfo?.serie || null;
+  const msg   = document.getElementById('neon-load-msg');
+  if (!nom) { msg.className = 'neon-msg err'; msg.textContent = '❌ Entrez un nom.'; return; }
+  msg.className = 'neon-msg'; msg.textContent = '⏳ Chargement…';
+  try {
+    let query, params;
+    if (serie) {
+      query  = `SELECT data FROM reponses WHERE data->>'eleve' = $1 AND data->'globalInfo'->>'serie' = $2 ORDER BY created_at DESC LIMIT 1`;
+      params = [nom, serie];
+    } else {
+      query  = `SELECT data FROM reponses WHERE data->>'eleve' = $1 ORDER BY created_at DESC LIMIT 1`;
+      params = [nom];
+    }
+    const res  = await neonQuery(query, params);
+    const data = res?.[0]?.data;
+    if (!data) throw new Error(`Aucune sauvegarde trouvée pour "${nom}"${serie ? ` / "${serie}"` : ''}.`);
+    loadFromData(data);
+    closeNeonLoadModal();
+  } catch(e) {
+    msg.className = 'neon-msg err'; msg.textContent = '❌ ' + e.message;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SAVE ANSWERS
+═══════════════════════════════════════════════════════════════ */
+function saveAnswers() {
+  if (current) userCode[current.id] = editor.getValue();
+  const saved = {
+    ...rawData,
+    exercises: exercises.map(ex => ({ ...ex, starter: userCode[ex.id] ?? ex.starter ?? '' }))
+  };
+  const blob = new Blob([JSON.stringify(saved, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const now  = new Date();
+  const ts   = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}`;
+  a.href     = url;
+  a.download = `reponses-${ts}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updateTitle() {
+  const serie = rawData?.globalInfo?.serie;
+  document.getElementById('topbar-title').textContent = serie ? serie : 'Python — Exercices Interactifs';
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════ */
+const params    = new URLSearchParams(window.location.search);
+const jsonParam = params.get('json');
+const autoUrl   = jsonParam || DEFAULT_JSON;
+if (autoUrl) loadJson(autoUrl);
+</script>
+</body>
+</html>
