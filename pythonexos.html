@@ -801,7 +801,7 @@ const NEON_CONNECTION = "postgresql://eleve_user:B123%2B%26%2F%25%2A%C3%A9%C3%A9
 let _neonSql = null;
 async function getNeonSql() {
   if (_neonSql) return _neonSql;
-  const { neon } = await import('https://esm.sh/@neondatabase/serverless@1');
+  const { neon } = await import('https://esm.sh/@neondatabase/serverless');
   _neonSql = neon(NEON_CONNECTION);
   return _neonSql;
 }
