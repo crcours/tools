@@ -118,6 +118,15 @@ if 'turtle' in sys.modules:
 `);
     // ── [/TURTLE] ─────────────────────────────────────────────
 
+    // Redirige input() vers prompt() du navigateur
+    await pyodide.runPythonAsync(`
+import builtins, js
+def _input(prompt=""):
+    result = js.prompt(prompt)
+    return result if result is not None else ""
+builtins.input = _input
+`);
+
     await pyodide.runPythonAsync(editor.getValue());
 
     // ── [TURTLE] Flush de la position finale de la tortue ─────
