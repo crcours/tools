@@ -137,6 +137,8 @@
     }
     function colorFromArgs(args, fname) {
       var c = null;
+      // exemple affiché dans les messages : dot() prend d'abord la taille
+      var ex = function (col) { return fname + "(" + (fname === "dot" ? "20, " : "") + col + ")"; };
       if (args.length === 1) {
         var v = js(args[0]);
         if (typeof v === "string") {
@@ -147,11 +149,16 @@
         }
         else if (Array.isArray(v) && v.length === 3) c = rgb(v, fname);
       } else if (args.length === 3) {
-        c = rgb(args.map(js), fname);
+        // Une couleur en nombres s'écrit toujours comme un tuple : color((255, 0, 0))
+        throw new Sk.builtin.TypeError(
+          "Couleur invalide dans " + fname + "() : mettez les trois nombres entre parenthèses, par exemple " +
+          ex("(255, 0, 0)")
+        );
       }
       if (c === null || !R.validColor(c)) {
         throw new Sk.builtin.TypeError(
-          "Couleur invalide dans " + fname + "() : utilisez par exemple " + fname + "(\"red\") ou " + fname + "(\"#ff8800\")"
+          "Couleur invalide dans " + fname + "() : utilisez par exemple " + ex("\"red\"") + " ou " +
+          ex("(255, 0, 0)")
         );
       }
       return c;
